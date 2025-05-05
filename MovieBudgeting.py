@@ -1,0 +1,14 @@
+import math 
+
+movietickets = float(input("Enter the number of movie ticket: "))
+snacks= float(input("Enter the number of snacks: "))
+drinks = float(input("Enter the number of drinks: "))
+
+costmovie = movietickets*12
+costsnacks = snacks* 2.5
+costdrinks = drinks*1.8
+
+totalCostBeforeTax = costmovie + costsnacks + costdrinks
+totalCostAfterTax = 10*(totalCostBeforeTax + totalCostBeforeTax*0.1)
+roundedTotalCostAfterTax = math.ceil(totalCostAfterTax)/10
+print("The total cost of the purchase is ${:.2f}".format(roundedTotalCostAfterTax))
