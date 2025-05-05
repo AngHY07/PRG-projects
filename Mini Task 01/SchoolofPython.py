@@ -1,4 +1,5 @@
-spells = ["Rain of Fire","Ice Lance","Teleport","Mana Ward","Arcane Missles"]
+# Ang Hao Yi (10273989D)
+spells = ["Rain of Fire","Ice Lance","Teleport","Mana Ward","Arcane Missiles"]
 
 print ('''
 Available spells:
