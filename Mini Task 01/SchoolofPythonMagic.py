@@ -12,7 +12,7 @@ Available spells:
 
 spellsequence = str(input('Enter 5 spell for activation(space-seperates): '))
 splitspell = spellsequence.split(" ")
-spellsactivation = [spells[int(splitspell[0])-1],spells[int(splitspell[1])-1],spells[int(splitspell[2])-1],spells[int(splitspell[3])-1],spells[int(splitspell[4])-1]]
+spellsactivationsequence = [spells[int(splitspell[0])-1],spells[int(splitspell[1])-1],spells[int(splitspell[2])-1],spells[int(splitspell[3])-1],spells[int(splitspell[4])-1]]
 
 print ('''
 Activation Sequence 
@@ -21,5 +21,5 @@ Activation Sequence
 {}
 {}
 {}       
-'''.format(spellsactivation[0],spellsactivation[1],spellsactivation[2],spellsactivation[3],spellsactivation[4]))
-print ("Ultimate Secret Spell: {} + {} + {}".format(spellsactivation[0],spellsactivation[2],spellsactivation[4]))
+'''.format(spellsactivationsequence[0],spellsactivationsequence[1],spellsactivationsequence[2],spellsactivationsequence[3],spellsactivationsequence[4]))
+print ("Ultimate Secret Spell: {} + {} + {}".format(spellsactivationsequence[0],spellsactivationsequence[2],spellsactivationsequence[4]))
