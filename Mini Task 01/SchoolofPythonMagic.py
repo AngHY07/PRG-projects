@@ -8,7 +8,6 @@ Available spells:
 3. {}
 4. {}
 5. {}
-
 '''.format(spells[0],spells[1],spells[2],spells[3],spells[4]))
 
 spellsequence = str(input('Enter 5 spell for activation(space-seperates): '))
