@@ -10,6 +10,6 @@ costsnacks = snacks* 2.5
 costdrinks = drinks*1.8
 
 totalCostBeforeTax = costmovie + costsnacks + costdrinks
-totalCostAfterTax = 10*(totalCostBeforeTax + totalCostBeforeTax*0.1)
-roundedTotalCostAfterTax = math.ceil(totalCostAfterTax)/10
+totalCostAfterTax = totalCostBeforeTax + totalCostBeforeTax*0.1
+roundedTotalCostAfterTax = math.ceil(totalCostAfterTax*10)/10
 print("The total cost of the purchase is ${:.2f}".format(roundedTotalCostAfterTax))
