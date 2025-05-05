@@ -1,3 +1,4 @@
+# Ang Hao Yi (10273989D)
 import math 
 
 movietickets = float(input("Enter the number of movie ticket: "))
