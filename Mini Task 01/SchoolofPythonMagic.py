@@ -21,4 +21,4 @@ Activation Sequence:
 {spells[int(splitspell[3])-1]}
 {spells[int(splitspell[4])-1]}       
 ''')
-print ("Ultimate Secret Spell: {} + {} + {}".format(spells[int(splitspell[0])-1],spells[int(splitspell[2])-1],spells[int(splitspell[4])-1]))
+print ("Ultimate Secret Spell: {} + {} + {}".format(spells[int(splitspell[0])-1],spells[int(splitspell[2])-1],spells[int(splitspell[-1])-1]))
