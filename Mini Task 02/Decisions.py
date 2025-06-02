@@ -6,8 +6,6 @@ temperature = float(input("Enter current temperature: "))
 
 random_value = random.randint(0,4)
 
-
-
 if temperature < 0 :
     out_or_in = "go to the moon and escape the cold"
 elif temperature > 30: 
