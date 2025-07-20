@@ -172,6 +172,7 @@ def buy_stuff():
                     print("Congratulations! You can now carry {} items!".format(CURRENT_BAG_CAPACITY+2))
                     CURRENT_BAG_CAPACITY += 2
                     CURRENT_GP -= CURRENT_BAG_CAPACITY*2
+    
     elif buy_1st_choice.lower() == "p":
         while True : 
             print("----------------------- Shop Menu -------------------------")
