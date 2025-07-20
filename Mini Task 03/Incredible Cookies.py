@@ -1,7 +1,6 @@
 # Ang Hao Yi 10273989D
 
 path = "C:\\Text Folders\\Minitask 03\\"
-ingredients_list = []
 
 def calculate_cookie_score(ingredients):
     score_local = 0
@@ -20,18 +19,19 @@ def calculate_cookie_score(ingredients):
 
 def process_cookie_file(filename):
     with open(path+filename,"r") as file :
+        ingredient_list = []
         info = file.readlines()
         counter = 0
         for x in info: 
             filtered_info = x.strip().split(",")
-            ingredients_list.append(list())
-            ingredients_list[counter].append(filtered_info[0])
-            ingredients_list[counter].append(list())
+            ingredient_list.append(list())
+            ingredient_list[counter].append(filtered_info[0])
+            ingredient_list[counter].append(list())
             
             for y in range(1,len(filtered_info)): 
-                ingredients_list[counter][1].append(filtered_info[y].replace(" ",""))
+                ingredient_list[counter][1].append(filtered_info[y].replace(" ",""))
             counter += 1
-
+    return ingredient_list
 
 def comment(final_score): 
 
@@ -43,9 +43,9 @@ def comment(final_score):
         print("This cookie deservers a gold medal.")
             
 
-process_cookie_file('ingredients.txt')
-stop = False
 
+stop = False
+ingredients_list = process_cookie_file('ingredients.txt')
 while not(stop): 
     yes_no = input("Would you like to score some cookies? (Type 'Stop' to quit, 'Yes' to start): ").lower()
 
