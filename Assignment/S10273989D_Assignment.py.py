@@ -23,7 +23,7 @@ STEP = 0
 
 minerals = ['copper', 'silver', 'gold']
 mineral_names = {'C': 'copper', 'S': 'silver', 'G': 'gold'}
-pickaxe_price = [50, 150]
+
 
 
 prices = {}
@@ -122,7 +122,7 @@ def show_town_menu(day):
 def player_information(): 
 
     print("----- Player Information -----")
-    print("Name: ".format(NAME))
+    print("Name: {}".format(NAME))
     print("Portal positition: ({},{})".format(MAP_WIDTH,MAP_HEIGHT))
     print("Pickaxe level: {} ({})".format(PICKAXE_LEVEL,PICKAXE_ORE))
     print("------------------------------")
@@ -132,15 +132,74 @@ def player_information():
     print("Steps taken: {}".format(STEP))
     print("------------------------------")
 
+def buy_stuff():
+    global CURRENT_BAG_CAPACITY
+    global CURRENT_GP
+    global PICKAXE_LEVEL
+    global PICKAXE_ORE
+
+    if PICKAXE_LEVEL == 1:
+        upgrade_ore = "silver"
+        upgrade_price = 50
+    elif PICKAXE_LEVEL == 2:
+        upgrade_ore = "gold"
+        upgrade_price = 150
+    print("----------------------- Shop Menu -------------------------")
+    print("(P) ickaxe upgrade to Level {} to mine {} ore for {} GP".format(PICKAXE_LEVEL,upgrade_ore,upgrade_price))
+    print("(B) ackpack upgrade to carry {} items for {} GP".format((CURRENT_BAG_CAPACITY+2),(CURRENT_BAG_CAPACITY*2)))
+    print("(L) eave shop")
+    print("-----------------------------------------------------------")
+    print("GP: {}".format(CURRENT_GP))
+    print("-----------------------------------------------------------")
+    buy_1st_choice = input("Your choice? ")
+
+    if buy_1st_choice.lower() == "b":
+        while True: 
+            
+            print("----------------------- Shop Menu -------------------------")
+            print("(B) ackpack upgrade to carry {} items for {} GP".format(CURRENT_BAG_CAPACITY+2,CURRENT_BAG_CAPACITY*2))
+            print("(L) eave shop") 
+            print("----------------------------------------------------------")
+            print("GP: {}".format(CURRENT_GP))
+            print("----------------------------------------------------------")
+            buy_2nd_choice = input("Your choice? ")
+            if buy_2nd_choice.lower() == "l":
+                return None
+            elif buy_2nd_choice.lower() == "b":
+                if CURRENT_GP < CURRENT_BAG_CAPACITY*2:
+                    print("You do not have enough GP! Come back again later.")
+                else:
+                    print("Congratulations! You can now carry {} items!".format(CURRENT_BAG_CAPACITY+2))
+                    CURRENT_BAG_CAPACITY += 2
+                    CURRENT_GP -= CURRENT_BAG_CAPACITY*2
+    elif buy_1st_choice.lower() == "p":
+        while True : 
+            print("----------------------- Shop Menu -------------------------")
+            print("(P) ickaxe upgrade to Level {} to mine {} ore for {} GP".format(PICKAXE_LEVEL,upgrade_ore,upgrade_price))
+            print("(L) eave shop") 
+            print("----------------------------------------------------------")
+            print("GP: {}".format(CURRENT_GP))
+            print("----------------------------------------------------------")
+            buy_2nd_choice = input("Your choice? ")
+            if buy_2nd_choice.lower() == "l":
+                return None
+            elif buy_2nd_choice.lower()=="p": 
+                if CURRENT_GP<upgrade_price:
+                    print("You do not have enough GP! Come back again later.")
+                else: 
+                    print("Congratulations you have upgraded you pickaxe to level {}.".format(PICKAXE_LEVEL+1))
+                    PICKAXE_LEVEL += 1
+                    CURRENT_GP -= upgrade_price
+
 
 
 #--------------------------- MAIN GAME ---------------------------
-game_state = 'main'
+
 print("---------------- Welcome to Sundrop Caves! ----------------")
 print("You spent all your money to get the deed to a mine, a small")
 print("  backpack, a simple pickaxe and a magical portal stone.")
 print()
-print("How quickly can you get the 1000 GP you need to retire")
+print("How quickly can you get the 500 GP you need to retire")
 print("  and live happily ever after?")
 print("-----------------------------------------------------------")   
 show_main_menu()
@@ -158,7 +217,13 @@ if user_choice.lower() == "n":
 
         if N_choice.lower() == "i":
             player_information()
+        elif N_choice.lower() == "b": 
+            buy_stuff()
         
+
+        
+
+
 
 
 
