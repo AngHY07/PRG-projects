@@ -674,6 +674,9 @@ if user_choice.lower() == "n":
             
             map_print_fog()
         elif N_choice.lower() =='e':
+            print("---------------------------------------------------")
+            print("                     Day{}                         ".format(player['day']))
+            print("---------------------------------------------------")
             if player['day'] > 1:
                 player['x'] = PORTAL_POSITION_X
                 player['y'] = PORTAL_POSITION_Y
@@ -695,9 +698,7 @@ if user_choice.lower() == "n":
 
             enter_stop = False
             while not(enter_stop):
-                print("---------------------------------------------------")
-                print("                     Day{}                         ".format(player['day']))
-                print("---------------------------------------------------")
+
                 print("Day {}".format(player['day']))
                 draw_view(player,resources_map)
                 print(f"Turns left:{player['turns']}    Load:{player['load']} / {CURRENT_BAG_CAPACITY}    Steps:{player['steps']}")
