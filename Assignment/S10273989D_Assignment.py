@@ -1,15 +1,16 @@
 from random import randint
+import copy
 path = "C:\\Text Folders\\Assignment 35%\\"
 
 high_score_days = []
 high_score_steps = []
 player = {}
-NAME = "NA"
+name = "NA"
 
 player_safe_information = {}
-resources_map_safe_file = ["map"]
+resources_map_safe_file = []
 name_safe = "NA"
-fog_safe_file = ["map"]
+fog_safe_file = []
 portal_position_x_safe = 0
 portal_position_y_safe = 0
 eligible_for_mine = True
@@ -23,7 +24,7 @@ TURNS_PER_DAY = 20
 WIN_GP = 500
 
 resources_map = []
-CURRENT_MAP_LAYOUT = [list("################################"),
+current_map_layout = [list("################################"),
                     list("#T?????????????????????????????#"),
                     list("#??????????????????????????????#"),
                     list("#??????????????????????????????#"),
@@ -36,14 +37,32 @@ CURRENT_MAP_LAYOUT = [list("################################"),
                     list("#??????????????????????????????#"),
                     list("################################")]
 
+def clear_safe_content():
+    global name
+    global player_safe_information
+    global resources_map_safe_file
+    global portal_position_x_safe
+    global portal_position_y_safe
+    global name_safe
+    global fog_safe_file
+
+    name_safe = "NA"
+    player_safe_information = {}
+    resources_map_safe_file = ["map"]
+    portal_position_x_safe = 0
+    portal_position_y_safe = 0
+
+
+
+
 def load_map(filename, map_struct,player):
     map_file = open(path + filename, 'r')
     global MAP_WIDTH
     global MAP_HEIGHT
-    global CURRENT_MAP_LAYOUT
+    global current_map_layout
 
-    CURRENT_MAP_LAYOUT[player['y']].pop(player['x'])
-    CURRENT_MAP_LAYOUT[player['y']].insert(player['x'],"M")
+    current_map_layout[player['y']].pop(player['x'])
+    current_map_layout[player['y']].insert(player['x'],"M")
 
     file_info = map_file.readlines()
     for lines in file_info: 
@@ -61,12 +80,12 @@ def load_map(filename, map_struct,player):
     map_struct[1][1] ="M"
 
     
-    MAP_WIDTH = len(map_struct[0])
+    MAP_WIDTH  = len(map_struct[0])
     MAP_HEIGHT = len(map_struct)
     map_file.close()
 
 def map_print_fog():
-    global CURRENT_MAP_LAYOUT
+    global current_map_layout
     global MAP_WIDTH
 
     print("+",end="")
@@ -74,10 +93,10 @@ def map_print_fog():
         print("-",end="")
     print("+")
 
-    for line in range(1,len(CURRENT_MAP_LAYOUT)-1):
+    for line in range(1,len(current_map_layout)-1):
         print("|",end="")
-        for column in range(1,len(CURRENT_MAP_LAYOUT[line])-1):
-            print(CURRENT_MAP_LAYOUT[line][column],end="")
+        for column in range(1,len(current_map_layout[line])-1):
+            print(current_map_layout[line][column],end="")
         print("|")
 
     print("+",end="")
@@ -86,7 +105,6 @@ def map_print_fog():
     print("+")
 
 def initialize_game(resources_map,player):
-    global CURRENT_MAP_LAYOUT
     global PORTAL_POSITION_X
     global PORTAL_POSITION_Y
     player['x'] = 1
@@ -111,13 +129,16 @@ def initialize_game(resources_map,player):
     load_map("level1.txt",resources_map,player)
     clear_fog(player,resources_map)
     
-def initialize_game_safe_folder(player,player_safe_information,resources_map_safe_file,fog_safe_file):
-    global CURRENT_MAP_LAYOUT
+def initialize_game_safe_folder(player,player_safe_information,):
+    global current_map_layout
     global PORTAL_POSITION_X
     global PORTAL_POSITION_Y
-    global NAME
+    global name
     global name_safe
     global resources_map
+    global resources_map_safe_file
+    global fog_safe_file
+
     
     player['x'] = player_safe_information['x']
     player['y'] =  player_safe_information['y']
@@ -136,13 +157,13 @@ def initialize_game_safe_folder(player,player_safe_information,resources_map_saf
     player['portal activated'] = player_safe_information['portal activated']
     
     NAME = name_safe
-    resources_map = resources_map_safe_file[0]
-    CURRENT_MAP_LAYOUT = fog_safe_file[0]
+    resources_map = copy.deepcopy(resources_map_safe_file)
+    current_map_layout = copy.deepcopy(fog_safe_file)
     PORTAL_POSITION_X = portal_position_x_safe
     PORTAL_POSITION_Y = portal_position_y_safe
 
-def draw_view (player,resources_map):
-    global CURRENT_MAP_LAYOUT
+def draw_view (player):
+    global current_map_layout
     while  True:
 
         print("+---+")
@@ -202,7 +223,7 @@ def player_information(player):
 
 def player_in_game_information(player):
     print("----- Player Information -----")
-    print("Name: {}".format(NAME))
+    print("Name: {}".format(name))
     print("Current position: ({},{})".format(player['x']-1,player['y']-1))
     print("Pickaxe level: {} ({})".format(player['pickaxe level'],player['pickaxe ore']))
     print("Gold: {}".format(player['gold']))
@@ -216,14 +237,13 @@ def player_in_game_information(player):
     print("------------------------------")
     
 def buy_stuff(player):
-    global CURRENT_BAG_CAPACITY
 
     if player['pickaxe level'] == 1:
-        upgrade_ore = "silver"
-        upgrade_price = 50
+                upgrade_ore = "silver"
+                upgrade_price = 50
     elif player['pickaxe level'] == 2:
-        upgrade_ore = "gold"
-        upgrade_price = 150
+                upgrade_ore = "gold"
+                upgrade_price = 150
     print("----------------------- Shop Menu -------------------------")
     print("(P) ickaxe upgrade to Level {} to mine {} ore for {} GP".format(player['pickaxe level']+1,upgrade_ore,upgrade_price))
     print("(B) ackpack upgrade to carry {} items for {} GP".format((player['current capacity']+2),(player['current capacity']*2)))
@@ -237,7 +257,7 @@ def buy_stuff(player):
         while True: 
             
             print("----------------------- Shop Menu -------------------------")
-            print("(B) ackpack upgrade to carry {} items for {} GP".format(CURRENT_BAG_CAPACITY+2,CURRENT_BAG_CAPACITY*2))
+            print("(B) ackpack upgrade to carry {} items for {} GP".format((player['current capacity']+2),(player['current capacity']*2)))
             print("(L) eave shop") 
             print("----------------------------------------------------------")
             print("GP: {}".format(player['gp']))
@@ -246,16 +266,22 @@ def buy_stuff(player):
             if buy_2nd_choice.lower() == "l":
                 return None
             elif buy_2nd_choice.lower() == "b":
-                if player['gp'] < CURRENT_BAG_CAPACITY*2:
+                if player['gp'] < player['current capacity']*2:
                     print("You do not have enough GP! Come back again later.")
                 else:
-                    print("Congratulations! You can now carry {} items!".format(CURRENT_BAG_CAPACITY+2))
-                    player['gp'] -= (CURRENT_BAG_CAPACITY*2)
-                    CURRENT_BAG_CAPACITY += 2
+                    print("Congratulations! You can now carry {} items!".format(player['current capacity']+2))
+                    player['gp'] -= (player['current capacity']*2)
+                    player['current capacity']+= 2
 
     
     elif buy_1st_choice.lower() == "p":
         while True : 
+            if player['pickaxe level'] == 1:
+                upgrade_ore = "silver"
+                upgrade_price = 50
+            elif player['pickaxe level'] == 2:
+                upgrade_ore = "gold"
+                upgrade_price = 150
             print("----------------------- Shop Menu -------------------------")
             print("(P) ickaxe upgrade to Level {} to mine {} ore for {} GP".format(player['pickaxe level']+1,upgrade_ore,upgrade_price))
             print("(L) eave shop") 
@@ -373,67 +399,66 @@ def ore_mining_a_d(player,value,copper_random,silver_random,gold_random):
                     player['gold'] += gold_random
 
 def upper_fog_left(player,resources_map):
-    global CURRENT_MAP_LAYOUT
-    CURRENT_MAP_LAYOUT[player['y']-1][player['x']-1] = resources_map[player['y']-1][player['x']-1]
-    CURRENT_MAP_LAYOUT[player['y']-1][player['x']] = resources_map[player['y']-1][player['x']]
+    global current_map_layout
+    current_map_layout[player['y']-1][player['x']-1] = resources_map[player['y']-1][player['x']-1]
+    current_map_layout[player['y']-1][player['x']] = resources_map[player['y']-1][player['x']]
     
 def upper_fog_right(player,resources_map):
 
-    CURRENT_MAP_LAYOUT[player['y']-1][player['x']] = resources_map[player['y']-1][player['x']]
-    CURRENT_MAP_LAYOUT[player['y']-1][player['x']+1] = resources_map[player['y']-1][player['x']+1]
+    current_map_layout[player['y']-1][player['x']] = resources_map[player['y']-1][player['x']]
+    current_map_layout[player['y']-1][player['x']+1] = resources_map[player['y']-1][player['x']+1]
 
 def right_side_fog(player,resources_map):
     global CURRENT_MAP_LAYOUT
-    CURRENT_MAP_LAYOUT[player['y']][player['x']+1]= resources_map[player['y']][player['x']+1]
+    current_map_layout[player['y']][player['x']+1]= resources_map[player['y']][player['x']+1]
     
 def left_side_fog(player,resources_map): 
     global CURRENT_MAP_LAYOUT
-    CURRENT_MAP_LAYOUT[player['y']][player['x']-1]= resources_map[player['y']][player['x']-1]
+    current_map_layout[player['y']][player['x']-1]= resources_map[player['y']][player['x']-1]
     
 def below_fog_right(player,resources_map):
-    global CURRENT_MAP_LAYOUT
+    global current_map_layout
 
-    CURRENT_MAP_LAYOUT[player['y']+1][player['x']]= resources_map[player['y']+1][player['x']]
-    CURRENT_MAP_LAYOUT[player['y']+1][player['x']+1] = resources_map[player['y']+1][player['x']+1]
+    current_map_layout[player['y']+1][player['x']]= resources_map[player['y']+1][player['x']]
+    current_map_layout[player['y']+1][player['x']+1] = resources_map[player['y']+1][player['x']+1]
     
 def below_fog_left(player,resources_map):
-    global CURRENT_MAP_LAYOUT
+    global current_map_layout
 
-    CURRENT_MAP_LAYOUT[player['y']+1][player['x']-1]= resources_map[player['y']+1][player['x']-1]
-    CURRENT_MAP_LAYOUT[player['y']+1][player['x']] = resources_map[player['y']+1][player['x']]
+    current_map_layout[player['y']+1][player['x']-1]= resources_map[player['y']+1][player['x']-1]
+    current_map_layout[player['y']+1][player['x']] = resources_map[player['y']+1][player['x']]
     
 def clear_fog(player,resources_map):
-    global CURRENT_MAP_LAYOUT
 
-    if CURRENT_MAP_LAYOUT[player['y']-1][player['x']] == "#" and CURRENT_MAP_LAYOUT[player['y']][player['x']+1] =="#":
+    if current_map_layout[player['y']-1][player['x']] == "#" and current_map_layout[player['y']][player['x']+1] =="#":
         left_side_fog(player,resources_map) 
         below_fog_left(player,resources_map)
-    elif CURRENT_MAP_LAYOUT[player['y']-1][player['x']] == "#" and CURRENT_MAP_LAYOUT[player['y']][player['x']-1] =="#":
+    elif current_map_layout[player['y']-1][player['x']] == "#" and current_map_layout[player['y']][player['x']-1] =="#":
         right_side_fog(player,resources_map)
         below_fog_right(player,resources_map)
-    elif CURRENT_MAP_LAYOUT[player['y']+1][player['x']] == "#" and CURRENT_MAP_LAYOUT[player['y']][player['x']+1] =="#":
+    elif current_map_layout[player['y']+1][player['x']] == "#" and current_map_layout[player['y']][player['x']+1] =="#":
         left_side_fog(player,resources_map)
         upper_fog_left(player,resources_map)
-    elif CURRENT_MAP_LAYOUT[player['y']+1][player['x']] == "#" and CURRENT_MAP_LAYOUT[player['y']][player['x']-1] =="#":
+    elif current_map_layout[player['y']+1][player['x']] == "#" and current_map_layout[player['y']][player['x']-1] =="#":
         right_side_fog(player,resources_map)
         upper_fog_right(player,resources_map)
-    elif CURRENT_MAP_LAYOUT[player['y']-1][player['x']] == "#":
+    elif current_map_layout[player['y']-1][player['x']] == "#":
         left_side_fog(player,resources_map)
         right_side_fog(player,resources_map)
         below_fog_left(player,resources_map)
         below_fog_right(player,resources_map)
-    elif CURRENT_MAP_LAYOUT[player['y']+1][player['x']] == "#":
+    elif current_map_layout[player['y']+1][player['x']] == "#":
         left_side_fog(player,resources_map)
         right_side_fog(player,resources_map)
         upper_fog_left(player,resources_map)
         upper_fog_right(player,resources_map)
-    elif CURRENT_MAP_LAYOUT[player['y']][player['x']+1] == "#":
+    elif current_map_layout[player['y']][player['x']+1] == "#":
         left_side_fog(player,resources_map)
         upper_fog_left(player,resources_map)
         upper_fog_right(player,resources_map)
         below_fog_left(player,resources_map)
         below_fog_right(player,resources_map)
-    elif CURRENT_MAP_LAYOUT[player['y']][player['x']-1] == "#":
+    elif current_map_layout[player['y']][player['x']-1] == "#":
         right_side_fog(player,resources_map)
         upper_fog_left(player,resources_map)
         upper_fog_right(player,resources_map)
@@ -448,7 +473,6 @@ def clear_fog(player,resources_map):
         below_fog_right(player,resources_map)
    
 def movement_input(player,resources_map,user_input): 
-    global CURRENT_BAG_CAPACITY
     global TURNS_PER_DAY
     global eligible_for_mine
 
@@ -464,19 +488,19 @@ def movement_input(player,resources_map,user_input):
         ore_mining_w_s (player,-1,copper_price,silver_price,gold_price)
         if eligible_for_mine == True:
             # Remove original postion
-            CURRENT_MAP_LAYOUT[player['y']].pop(player['x'])
+            current_map_layout[player['y']].pop(player['x'])
             resources_map[player['y']].pop(player['x'])
 
             #Replace original position with blank space
-            CURRENT_MAP_LAYOUT[player['y']].insert(player['x']," ")
+            current_map_layout[player['y']].insert(player['x']," ")
             resources_map[player['y']].insert(player['x']," ")
 
             # Remove the position on top
-            CURRENT_MAP_LAYOUT[player['y']-1].pop(player['x'])
+            current_map_layout[player['y']-1].pop(player['x'])
             resources_map[player['y']-1].pop(player['x'])
 
             #Replace position on top with M
-            CURRENT_MAP_LAYOUT[player['y']-1].insert(player['x'],"M")
+            current_map_layout[player['y']-1].insert(player['x'],"M")
             resources_map[player['y']-1].insert(player['x'],"M")
 
         
@@ -489,7 +513,7 @@ def movement_input(player,resources_map,user_input):
     
     #S 
     elif  user_input.lower() == "s":
-        if CURRENT_MAP_LAYOUT[player['y']+1][player['x']] == "#":
+        if current_map_layout[player['y']+1][player['x']] == "#":
             print("You are at the barrier, you can't move further down")
             return 
 
@@ -497,23 +521,23 @@ def movement_input(player,resources_map,user_input):
     
         if eligible_for_mine == True:
             # Remove original postion
-            CURRENT_MAP_LAYOUT[player['y']].pop(player['x'])
+            current_map_layout[player['y']].pop(player['x'])
             resources_map[player['y']].pop(player['x'])
 
             #Replace original position with blank space
             if player["y"] == 1 and player["x"]  == 1:
-                CURRENT_MAP_LAYOUT[player['y']].insert(player['x'],"T")
+                current_map_layout[player['y']].insert(player['x'],"T")
                 resources_map[player['y']].insert(player['x'],"T")
             else: 
-                CURRENT_MAP_LAYOUT[player['y']].insert(player['x']," ")
+                current_map_layout[player['y']].insert(player['x']," ")
                 resources_map[player['y']].insert(player['x']," ")
 
             # Remove the position on bottom
-            CURRENT_MAP_LAYOUT[player['y']+1].pop(player['x'])
+            current_map_layout[player['y']+1].pop(player['x'])
             resources_map[player['y']+1].pop(player['x'])
 
             #Replace position on bottom with M
-            CURRENT_MAP_LAYOUT[player['y']+1].insert(player['x'],"M")
+            current_map_layout[player['y']+1].insert(player['x'],"M")
             resources_map[player['y']+1].insert(player['x'],"M")
 
   
@@ -526,7 +550,7 @@ def movement_input(player,resources_map,user_input):
     
     #A
     elif  user_input.lower() == "a":
-        if CURRENT_MAP_LAYOUT[player['y']][player['x']-1] == "#":
+        if current_map_layout[player['y']][player['x']-1] == "#":
             print("You are at the barrier, you can't move to your left")
             return 
 
@@ -534,19 +558,19 @@ def movement_input(player,resources_map,user_input):
 
         if eligible_for_mine == True:
             # Remove original postion
-            CURRENT_MAP_LAYOUT[player['y']].pop(player['x'])
+            current_map_layout[player['y']].pop(player['x'])
             resources_map[player['y']].pop(player['x'])
 
             #Replace original position with blank space
-            CURRENT_MAP_LAYOUT[player['y']].insert(player['x']," ")
+            current_map_layout[player['y']].insert(player['x']," ")
             resources_map[player['y']].insert(player['x']," ")
 
             # Remove the position on right
-            CURRENT_MAP_LAYOUT[player['y']].pop(player['x']-1)
+            current_map_layout[player['y']].pop(player['x']-1)
             resources_map[player['y']].pop(player['x']-1)
 
             #Replace position on right with M
-            CURRENT_MAP_LAYOUT[player['y']].insert(player['x']-1,"M")
+            current_map_layout[player['y']].insert(player['x']-1,"M")
             resources_map[player['y']].insert(player['x']-1,"M")
 
 
@@ -559,7 +583,7 @@ def movement_input(player,resources_map,user_input):
 
     #D
     elif  user_input.lower() == "d":
-        if CURRENT_MAP_LAYOUT[player['y']][player['x']+1] == "#":
+        if current_map_layout[player['y']][player['x']+1] == "#":
             print("You are at the barrier, you can't move to your right")
             return 
 
@@ -567,23 +591,23 @@ def movement_input(player,resources_map,user_input):
 
         if eligible_for_mine == True:
             # Remove original postion
-            CURRENT_MAP_LAYOUT[player['y']].pop(player['x'])
+            current_map_layout[player['y']].pop(player['x'])
             resources_map[player['y']].pop(player['x'])
 
             #Replace original position with blank space
             if player["y"] == 1 and player["x"]  == 1:
-                CURRENT_MAP_LAYOUT[player['y']].insert(player['x'],"T")
+                current_map_layout[player['y']].insert(player['x'],"T")
                 resources_map[player['y']].insert(player['x'],"T")
             else: 
-                CURRENT_MAP_LAYOUT[player['y']].insert(player['x']," ")
+                current_map_layout[player['y']].insert(player['x']," ")
                 resources_map[player['y']].insert(player['x']," ")
 
             # Remove the position on right
-            CURRENT_MAP_LAYOUT[player['y']].pop(player['x']+1)
+            current_map_layout[player['y']].pop(player['x']+1)
             resources_map[player['y']].pop(player['x']+1)
 
             #Replace position on right with M
-            CURRENT_MAP_LAYOUT[player['y']].insert(player['x']+1,"M")
+            current_map_layout[player['y']].insert(player['x']+1,"M")
             resources_map[player['y']].insert(player['x']+1,"M")
             player['x'] += 1
             player['turns'] -= 1
@@ -603,21 +627,21 @@ def portal(player):
     silver_earning = 0
     gold_earning = 0
 
-    global CURRENT_MAP_LAYOUT
-    CURRENT_MAP_LAYOUT[player['y']].pop(player['x'])
+ 
+    current_map_layout[player['y']].pop(player['x'])
     resources_map[player['y']].pop(player['x'])
 
-    CURRENT_MAP_LAYOUT[player['y']].insert(player['x'],"P")
+    current_map_layout[player['y']].insert(player['x'],"P")
     resources_map[player['y']].insert(player['x'],"P")
 
     PORTAL_POSITION_X = player['x']
     PORTAL_POSITION_Y = player['y']
 
 
-    CURRENT_MAP_LAYOUT[1].pop(1)
+    current_map_layout[1].pop(1)
     resources_map[1].pop(1)
 
-    CURRENT_MAP_LAYOUT[1].insert(1,"M")
+    current_map_layout[1].insert(1,"M")
     resources_map[1].insert(1,"M")
 
 
@@ -653,16 +677,19 @@ def portal(player):
     
 
 def end_game(player):
-    global NAME
+    global name
     print("-------------------------------------------------------------")
-    print("Woo-hoo! Well done, {}, you have {} GP!".format(NAME,player['gp']))
+    print("Woo-hoo! Well done, {}, you have {} GP!".format(name,player['gp']))
     print("You now have enough to retire and play video games every day.")
-    print("And it only took you {} days and {} steps! You win!".format(player['day'] and player['steps']))
+    print("And it only took you {} days and {} steps! You win!".format(player['day']-1 , player['steps']))
     
 def safe_game(player_safe_information,player):
+            global fog_safe_file
+            global resources_map_safe_file
             global name_safe
             global portal_position_x_safe
             global portal_position_y_safe
+            global resources_map
             player_safe_information['x'] = player['x']
             player_safe_information['y'] = player['y'] 
             player_safe_information['copper'] = player['copper'] 
@@ -678,9 +705,9 @@ def safe_game(player_safe_information,player):
             player_safe_information['pickaxe level'] = player['pickaxe level']
             player_safe_information['pickaxe ore'] = player['pickaxe ore']
             player_safe_information['portal activated'] = player['portal activated']
-            fog_safe_file[0]= CURRENT_MAP_LAYOUT
-            resources_map_safe_file[0] = resources_map
-            name_safe = NAME
+            fog_safe_file = copy.deepcopy(current_map_layout)
+            resources_map_safe_file = copy.deepcopy(resources_map)
+            name_safe = name
             portal_position_x_safe = PORTAL_POSITION_X
             portal_position_y_safe = PORTAL_POSITION_Y
             print("---------------------------------------------------")
@@ -707,7 +734,7 @@ while not(whole_game_stop):
 
     if user_choice.lower() == "n": 
         resources_map =[]
-        CURRENT_MAP_LAYOUT = [list("################################"),
+        current_map_layout = [list("################################"),
                     list("#T?????????????????????????????#"),
                     list("#??????????????????????????????#"),
                     list("#??????????????????????????????#"),
@@ -721,15 +748,15 @@ while not(whole_game_stop):
                     list("################################")]
 
         initialize_game(resources_map,player)
-        NAME = input("Greetings, miner! What is your name? ")
-        print("Pleased to meet you, {}. Welcome tp Sundrop Town!".format(NAME))
+        name = input("Greetings, miner! What is your name? ")
+        print("Pleased to meet you, {}. Welcome tp Sundrop Town!".format(name))
     elif user_choice.lower() == "l":
         if name_safe == "NA":
             print('You do not have a save game')
             continue
         else:
             resources_map = []
-            initialize_game_safe_folder(player,player_safe_information,resources_map_safe_file,fog_safe_file)
+            initialize_game_safe_folder(player,player_safe_information)
     # elif user_choice.lower() =="h":
 
     elif user_choice.lower() == "q":
@@ -742,6 +769,7 @@ while not(whole_game_stop):
                 end_game(player)
                 high_score_days.append(player['day'])
                 high_score_steps.append(player['steps'])
+                # clear_safe_content()
                 stop = True
                 continue
                 
@@ -756,7 +784,7 @@ while not(whole_game_stop):
                 map_print_fog()
             elif choice.lower() =='e':
                 if player['day'] > 1:
-                    CURRENT_MAP_LAYOUT[1][1]= "T"
+                    current_map_layout[1][1]= "T"
                     resources_map[1][1] ="T"
 
                 print("---------------------------------------------------")
@@ -764,21 +792,21 @@ while not(whole_game_stop):
                 print("---------------------------------------------------")
                 if player['portal activated'] == True:
 
-                    CURRENT_MAP_LAYOUT[PORTAL_POSITION_Y].pop(PORTAL_POSITION_X)
+                    current_map_layout[PORTAL_POSITION_Y].pop(PORTAL_POSITION_X)
                     resources_map[PORTAL_POSITION_Y].pop(PORTAL_POSITION_X)
 
-                    CURRENT_MAP_LAYOUT[PORTAL_POSITION_Y].insert(PORTAL_POSITION_X,"M")
+                    current_map_layout[PORTAL_POSITION_Y].insert(PORTAL_POSITION_X,"M")
                     resources_map[PORTAL_POSITION_Y].insert(PORTAL_POSITION_X,"M")   
                     PORTAL_POSITION_X = 1
                     PORTAL_POSITION_Y = 1
-                    player['portal activated'] == False
+                    player['portal activated'] = False
 
 
                 enter_stop = False
                 while not(enter_stop):
 
                     print("Day {}".format(player['day']))
-                    draw_view(player,resources_map)
+                    draw_view(player)
                     print(f"Turns left:{player['turns']}    Load:{player['load']} / {player['current capacity']}    Steps:{player['steps']}")
                     print("(WASD) to move")
                     print("(M)ap, (I)nformation, (P)ortal, (Q)uit to main menu")
@@ -809,7 +837,7 @@ while not(whole_game_stop):
             elif choice.lower() =="q":
                 stop = True
                 continue
-            elif choice.lower() =="s":
+            elif choice.lower() =="v":
                 safe_game(player_safe_information,player)
 
 
