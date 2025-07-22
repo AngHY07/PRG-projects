@@ -1,6 +1,8 @@
 from random import randint
 path = "C:\\Text Folders\\Assignment 35%\\"
 
+high_score_days = []
+high_score_steps = []
 player = {}
 NAME = "NA"
 
@@ -113,6 +115,8 @@ def initialize_game_safe_folder(player,player_safe_information,resources_map_saf
     global CURRENT_MAP_LAYOUT
     global PORTAL_POSITION_X
     global PORTAL_POSITION_Y
+    global NAME
+    global name_safe
     global resources_map
     
     player['x'] = player_safe_information['x']
@@ -131,6 +135,7 @@ def initialize_game_safe_folder(player,player_safe_information,resources_map_saf
     player['pickaxe ore'] = player_safe_information['pickaxe ore'] 
     player['portal activated'] = player_safe_information['portal activated']
     
+    NAME = name_safe
     resources_map = resources_map_safe_file[0]
     CURRENT_MAP_LAYOUT = fog_safe_file[0]
     PORTAL_POSITION_X = portal_position_x_safe
@@ -166,7 +171,7 @@ def show_main_menu():
     print("--- Main Menu ----")
     print("(N)ew game")
     print("(L)oad saved game")
-#    print("(H)igh scores")
+    print("(H)igh scores")
     print("(Q)uit")
     print("------------------")
 
@@ -648,8 +653,9 @@ def portal(player):
     
 
 def end_game(player):
+    global NAME
     print("-------------------------------------------------------------")
-    print("Woo-hoo! Well done, {}, you have {} GP!".format())
+    print("Woo-hoo! Well done, {}, you have {} GP!".format(NAME,player['gp']))
     print("You now have enough to retire and play video games every day.")
     print("And it only took you {} days and {} steps! You win!".format(player['day'] and player['steps']))
     
@@ -680,6 +686,9 @@ def safe_game(player_safe_information,player):
             print("---------------------------------------------------")
             print("Game has been save successfully!")
             print("---------------------------------------------------")
+
+# def rearrange_score(high_score_days,high_score_steps):
+
 #--------------------------- MAIN GAME ---------------------------
 
 print("---------------- Welcome to Sundrop Caves! ----------------")
@@ -721,13 +730,18 @@ while not(whole_game_stop):
         else:
             resources_map = []
             initialize_game_safe_folder(player,player_safe_information,resources_map_safe_file,fog_safe_file)
+    # elif user_choice.lower() =="h":
+
     elif user_choice.lower() == "q":
         whole_game_stop = True
         continue
+
     while not(stop):
 
             if player['gp'] >= 500:
                 end_game(player)
+                high_score_days.append(player['day'])
+                high_score_steps.append(player['steps'])
                 stop = True
                 continue
                 
