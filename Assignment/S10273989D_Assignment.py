@@ -3,28 +3,30 @@ from random import randint
 path = "C:\\Text Folders\\Assignment 35%\\"
 
 player = {}
-resources_map = []
-fog = []
+
+
 NAME = "NA"
+
+player_safe_information = {}
+resources_map_safe_file = ["map"]
+name_safe = "NA"
+fog_safe_file = ["map"]
+portal_position_x_safe = 0
+portal_position_y_safe = 0
+
+
 
 
 MAP_WIDTH = 0
 MAP_HEIGHT = 0
 PORTAL_POSITION_X = 1
 PORTAL_POSITION_Y = 1
-TOWN_POSITION_X = 0
-TOWN_POSITION_Y = 0 
-
 
 
 TURNS_PER_DAY = 20
 WIN_GP = 500
-CURRENT_BAG_CAPACITY = 10
-BACKPACK_SPACE_TAKEN = 0
-PICKAXE_LEVEL = 1
-PICKAXE_ORE = "copper"
-STEP = 0
 
+resources_map = []
 CURRENT_MAP_LAYOUT = [list("################################"),
                     list("#T?????????????????????????????#"),
                     list("#??????????????????????????????#"),
@@ -38,15 +40,7 @@ CURRENT_MAP_LAYOUT = [list("################################"),
                     list("#??????????????????????????????#"),
                     list("################################")]
 
-minerals = ['copper', 'silver', 'gold']
-mineral_names = {'C': 'copper', 'S': 'silver', 'G': 'gold'}
 
-
-
-prices = {}
-prices['copper'] = (1, 3)
-prices['silver'] = (5, 8)
-prices['gold'] = (10, 18)
 
 # This function loads a map structure (a nested list) from a file
 # It also updates MAP_WIDTH and MAP_HEIGHT
@@ -72,8 +66,7 @@ def load_map(filename, map_struct,player):
     map_struct.insert(0,list("################################"))
     map_struct.append(list("################################"))
 
-    map_struct[player['y']].pop(player['x'])
-    map_struct[player['y']].insert(player['x'],"M")
+    map_struct[1][1] ="M"
 
     
     MAP_WIDTH = len(map_struct[0])
@@ -89,7 +82,7 @@ def map_print_fog():
         print("-",end="")
     print("+")
 
-    for line in range(1,len(CURRENT_MAP_LAYOUT)-2):
+    for line in range(1,len(CURRENT_MAP_LAYOUT)-1):
         print("|",end="")
         for column in range(1,len(CURRENT_MAP_LAYOUT[line])-1):
             print(CURRENT_MAP_LAYOUT[line][column],end="")
@@ -101,14 +94,10 @@ def map_print_fog():
     print("+")
 
 
-# This function clears the fog of war at the 3x3 square around the player
-
-
-
-
-def initialize_game(game_map, fog, player):
+def initialize_game(resources_map,player):
     global CURRENT_MAP_LAYOUT
-
+    global PORTAL_POSITION_X
+    global PORTAL_POSITION_Y
     player['x'] = 1
     player['y'] = 1
     player['copper'] = 0
@@ -120,14 +109,45 @@ def initialize_game(game_map, fog, player):
     player['turns'] = TURNS_PER_DAY
     player['load'] = 0
     player['gp'] = 0
- 
+    player['pickaxe level'] = 1
+    player['current capacity'] = 10
+    player['pickaxe ore'] = "copper"
+    PORTAL_POSITION_X = 1
+    PORTAL_POSITION_Y = 1
 
     
-
     load_map("level1.txt",resources_map,player)
     clear_fog(player,resources_map)
+    
+ 
+def initialize_game_safe_folder(player,player_safe_information,resources_map_safe_file,fog_safe_file):
+    global CURRENT_MAP_LAYOUT
+    global PORTAL_POSITION_X
+    global PORTAL_POSITION_Y
+    global resources_map
+    
+    player['x'] = player_safe_information['x']
+    player['y'] =  player_safe_information['y']
+    player['copper'] = player_safe_information['copper']
+    player['silver'] = player_safe_information['silver']
+    player['gold'] = player_safe_information['gold']
+    player['GP'] = player_safe_information['GP']
+    player['day'] = player_safe_information['day']
+    player['steps'] = player_safe_information['steps'] 
+    player['turns'] = TURNS_PER_DAY
+    player['load'] = player_safe_information['load']
+    player['gp'] = player_safe_information['gp']
+    player['current capacity'] = player_safe_information['current capacity']
+    player['pickaxe level'] = player_safe_information['pickaxe level']
+    player['pickaxe ore'] = player_safe_information['pickaxe ore'] 
+    
+    resources_map = resources_map_safe_file[0]
+    CURRENT_MAP_LAYOUT = fog_safe_file[0]
+    PORTAL_POSITION_X = portal_position_x_safe
+    PORTAL_POSITION_Y = portal_position_y_safe
 
 
+ 
 def draw_view (player,resources_map):
     global CURRENT_MAP_LAYOUT
     while  True:
@@ -153,21 +173,6 @@ def draw_view (player,resources_map):
         print("+---+")
         return
 
-
-
-# This function saves the game
-def save_game(game_map, fog, player):
-    # save map
-    # save fog
-    # save player
-    return
-        
-# This function loads the game
-def load_game(game_map, fog, player):
-    # load map
-    # load fog
-    # load player
-    return
 
 def show_main_menu():
     print()
@@ -196,24 +201,24 @@ def player_information(player):
     print("----- Player Information -----")
     print("Name: {}".format(NAME))
     print("Portal position: ({},{})".format(PORTAL_POSITION_X-1,PORTAL_POSITION_Y-1))
-    print("Pickaxe level: {} ({})".format(PICKAXE_LEVEL,PICKAXE_ORE))
+    print("Pickaxe level: {} ({})".format(player['pickaxe level'],player['pickaxe ore']))
     print("------------------------------")
-    print("Load: {}/{}".format(player['load'],CURRENT_BAG_CAPACITY))
+    print("Load: {}/{}".format(player['load'],player['current capacity']))
     print("------------------------------")
     print("GP: {}".format(player["gp"]))
-    print("Steps taken: {}".format(STEP))
+    print("Steps taken: {}".format(player['steps']))
     print("------------------------------")
 
 def player_in_game_information(player):
     print("----- Player Information -----")
     print("Name: {}".format(NAME))
     print("Current position: ({},{})".format(player['x']-1,player['y']-1))
-    print("Pickaxe level: {} ({})".format(PICKAXE_LEVEL,PICKAXE_ORE))
+    print("Pickaxe level: {} ({})".format(player['pickaxe level'],player['pickaxe ore']))
     print("Gold: {}".format(player['gold']))
     print("Silver: {}".format(player['silver']))
     print("Copper: {}".format(player['copper']))
     print("------------------------------")
-    print("Load: {} / {}".format(player['load'],CURRENT_BAG_CAPACITY))
+    print("Load: {} / {}".format(player['load'],player['current capacity']))
     print("------------------------------")
     print("GP: {}".format(player['gp']))
     print("Steps taken: {}".format(player['steps']))
@@ -222,18 +227,16 @@ def player_in_game_information(player):
 
 def buy_stuff(player):
     global CURRENT_BAG_CAPACITY
-    global PICKAXE_LEVEL
-    global PICKAXE_ORE
 
-    if PICKAXE_LEVEL == 1:
+    if player['pickaxe level'] == 1:
         upgrade_ore = "silver"
         upgrade_price = 50
-    elif PICKAXE_LEVEL == 2:
+    elif player['pickaxe level'] == 2:
         upgrade_ore = "gold"
         upgrade_price = 150
     print("----------------------- Shop Menu -------------------------")
-    print("(P) ickaxe upgrade to Level {} to mine {} ore for {} GP".format(PICKAXE_LEVEL,upgrade_ore,upgrade_price))
-    print("(B) ackpack upgrade to carry {} items for {} GP".format((CURRENT_BAG_CAPACITY+2),(CURRENT_BAG_CAPACITY*2)))
+    print("(P) ickaxe upgrade to Level {} to mine {} ore for {} GP".format(player['pickaxe level'],upgrade_ore,upgrade_price))
+    print("(B) ackpack upgrade to carry {} items for {} GP".format((player['current capacity']+2),(player['current capacity']*2)))
     print("(L) eave shop")
     print("-----------------------------------------------------------")
     print("GP: {}".format(player['gp']))
@@ -264,7 +267,7 @@ def buy_stuff(player):
     elif buy_1st_choice.lower() == "p":
         while True : 
             print("----------------------- Shop Menu -------------------------")
-            print("(P) ickaxe upgrade to Level {} to mine {} ore for {} GP".format(PICKAXE_LEVEL,upgrade_ore,upgrade_price))
+            print("(P) ickaxe upgrade to Level {} to mine {} ore for {} GP".format(player['pickaxe level']+1,upgrade_ore,upgrade_price))
             print("(L) eave shop") 
             print("----------------------------------------------------------")
             print("GP: {}".format(player['gp']))
@@ -276,68 +279,63 @@ def buy_stuff(player):
                 if player['gp']<upgrade_price:
                     print("You do not have enough GP! Come back again later.")
                 else: 
-                    print("Congratulations you have upgraded you pickaxe to level {}.".format(PICKAXE_LEVEL+1))
-                    PICKAXE_LEVEL += 1
-                    PICKAXE_ORE = upgrade_ore
+                    print("Congratulations you have upgraded you pickaxe to level {}.".format(player['pickaxe level']+1))
+                    player['pickaxe level'] += 1
+                    player['pickaxe ore'] = upgrade_ore
                     player['gp'] -= upgrade_price
 
-def ore_mining_w_s(player,value):
-    copper_random = randint(1,5)
-    silver_random = randint(1,3)
-    gold_random = randint(1,2)
-    global CURRENT_BAG_CAPACITY
+def ore_mining_w_s(player,value,copper_random,silver_random,gold_random):
 
+   
     if resources_map[player['y']+value][player['x']] == "C":
             print("---------------------------------------------------")
             print("You mined {} piece(s) of copper.".format(copper_random))
 
-            if (player['load']+copper_random) > CURRENT_BAG_CAPACITY:
-                remaining_slots = CURRENT_BAG_CAPACITY-player['load']
+            if (player['load']+copper_random) > player['current capacity']:
+                remaining_slots = player['current capacity']-player['load']
                 print("... but you can only carry {} more piece(s)!".format(remaining_slots))
-                player['load'] = CURRENT_BAG_CAPACITY
+                player['load'] = player['current capacity']
                 player['copper'] += remaining_slots
             else :
                 player['load'] += copper_random
                 player['copper'] += copper_random
     elif resources_map[player['y']+value][player['x']] == "S":
             print("---------------------------------------------------")
-            print("You mined {} piece(s) of silver.".format(copper_random))
+            print("You mined {} piece(s) of silver.".format(silver_random))
 
-            if (player['load']+silver_random) > CURRENT_BAG_CAPACITY:
-                remaining_slots = CURRENT_BAG_CAPACITY-player['load']
+            if (player['load']+silver_random) > player['current capacity']:
+                remaining_slots = player['current capacity']-player['load']
                 print("... but you can only carry {} more piece(s)!".format(remaining_slots))
-                player['load'] = CURRENT_BAG_CAPACITY
+                player['load'] = player['current capacity']
                 player['silver'] += remaining_slots
             else :
                 player['load'] += silver_random
                 player['silver'] += silver_random
     elif resources_map[player['y']+value][player['x']] == "G":
             print("---------------------------------------------------")
-            print("You mined {} piece(s) of gold.".format(copper_random))
+            print("You mined {} piece(s) of gold.".format(gold_random))
 
-            if (player['load']+gold_random) > CURRENT_BAG_CAPACITY:
-                remaining_slots = CURRENT_BAG_CAPACITY-player['load']
+            if (player['load']+gold_random) > player['current capacity']:
+                remaining_slots = player['current capacity']-player['load']
                 print("... but you can only carry {} more piece(s)!".format(remaining_slots))
-                player['load'] = CURRENT_BAG_CAPACITY
+                player['load'] = player['current capacity']
                 player['gold'] += remaining_slots
             else :
                 player['load'] += gold_random
                 player['gold'] += gold_random
 
-def ore_mining_a_d(player,value):
-    copper_random = randint(1,5)
-    silver_random = randint(1,3)
-    gold_random = randint(1,2)
-    global CURRENT_BAG_CAPACITY
+def ore_mining_a_d(player,value,copper_random,silver_random,gold_random):
+
+    
 
     if resources_map[player['y']][player['x']+value] == "C":
             print("---------------------------------------------------")
             print("You mined {} piece(s) of copper.".format(copper_random))
 
-            if (player['load']+copper_random) > CURRENT_BAG_CAPACITY:
-                remaining_slots = CURRENT_BAG_CAPACITY-player['load']
+            if (player['load']+copper_random) > player['current capacity']:
+                remaining_slots = player['current capacity']-player['load']
                 print("... but you can only carry {} more piece(s)!".format(remaining_slots))
-                player['load'] = CURRENT_BAG_CAPACITY
+                player['load'] = player['current capacity']
                 player['copper'] += remaining_slots
 
             else :
@@ -345,24 +343,24 @@ def ore_mining_a_d(player,value):
                 player['copper'] += copper_random
     elif resources_map[player['y']][player['x']+value] == "S":
             print("---------------------------------------------------")
-            print("You mined {} piece(s) of silver.".format(copper_random))
+            print("You mined {} piece(s) of silver.".format(silver_random))
 
-            if (player['load']+silver_random) > CURRENT_BAG_CAPACITY:
-                remaining_slots = CURRENT_BAG_CAPACITY-player['load']
+            if (player['load']+silver_random) > player['current capacity']:
+                remaining_slots = player['current capacity']-player['load']
                 print("... but you can only carry {} more piece(s)!".format(remaining_slots))
-                player['load'] = CURRENT_BAG_CAPACITY
+                player['load'] = player['current capacity']
                 player['silver'] += remaining_slots
             else :
                 player['load'] += silver_random
                 player['silver'] += silver_random
     elif resources_map[player['y']][player['x']+value] == "G":
             print("---------------------------------------------------")
-            print("You mined {} piece(s) of gold.".format(copper_random))
+            print("You mined {} piece(s) of gold.".format(gold_random))
 
-            if (player['load']+gold_random) > CURRENT_BAG_CAPACITY:
-                remaining_slots = CURRENT_BAG_CAPACITY-player['load']
+            if (player['load']+gold_random) > player['current capacity']:
+                remaining_slots = player['current capacity']-player['load']
                 print("... but you can only carry {} more piece(s)!".format(remaining_slots))
-                player['load'] = CURRENT_BAG_CAPACITY
+                player['load'] = player['current capacity']
                 player['gold'] += remaining_slots
             else :
                 player['load'] += gold_random
@@ -454,13 +452,16 @@ def movement_input(player,resources_map,user_input):
     global CURRENT_BAG_CAPACITY
     global TURNS_PER_DAY
 
+    copper_price = randint(1,5)
+    silver_price= randint(1,3)
+    gold_price = randint(1,2)
     # W
     if user_input.lower() == "w":
         if player['y'] == 1:
             print("You are at the barrier, you can't move further up")
             return 
-        clear_fog(player,resources_map)
-        ore_mining_w_s (player,-1)
+
+        ore_mining_w_s (player,-1,copper_price,silver_price,gold_price)
         # Remove original postion
         CURRENT_MAP_LAYOUT[player['y']].pop(player['x'])
         resources_map[player['y']].pop(player['x'])
@@ -489,8 +490,8 @@ def movement_input(player,resources_map,user_input):
         if CURRENT_MAP_LAYOUT[player['y']+1][player['x']] == "#":
             print("You are at the barrier, you can't move further down")
             return 
-        clear_fog(player,resources_map)
-        ore_mining_w_s(player,1)
+
+        ore_mining_w_s (player,1,copper_price,silver_price,gold_price)
         
         # Remove original postion
         CURRENT_MAP_LAYOUT[player['y']].pop(player['x'])
@@ -524,8 +525,8 @@ def movement_input(player,resources_map,user_input):
         if CURRENT_MAP_LAYOUT[player['y']][player['x']-1] == "#":
             print("You are at the barrier, you can't move to your left")
             return 
-        clear_fog(player,resources_map)
-        ore_mining_a_d(player,-1)
+
+        ore_mining_a_d(player,-1,copper_price,silver_price,gold_price)
         
         # Remove original postion
         CURRENT_MAP_LAYOUT[player['y']].pop(player['x'])
@@ -556,8 +557,8 @@ def movement_input(player,resources_map,user_input):
         if CURRENT_MAP_LAYOUT[player['y']][player['x']+1] == "#":
             print("You are at the barrier, you can't move to your right")
             return 
-        clear_fog(player,resources_map)
-        ore_mining_a_d(player,+1)
+
+        ore_mining_a_d(player,1,copper_price,silver_price,gold_price)
         
         # Remove original postion
         CURRENT_MAP_LAYOUT[player['y']].pop(player['x'])
@@ -604,8 +605,7 @@ def portal(player):
 
     PORTAL_POSITION_X = player['x']
     PORTAL_POSITION_Y = player['y']
-    player['x'] = 1
-    player['y'] = 1
+
 
     CURRENT_MAP_LAYOUT[1].pop(1)
     resources_map[1].pop(1)
@@ -615,6 +615,9 @@ def portal(player):
 
 
     print("-----------------------------------------------------")
+    if player['turns'] == 0:
+        print("You can't carry any more, so you can't go that way.")
+        print("You are exhausted.")
     print("You place your portal stone here and zap back to town.")
 
     if player['copper'] > 0:
@@ -641,10 +644,15 @@ def portal(player):
     return 
     
 
-
+def end_game(player):
+    print("-------------------------------------------------------------")
+    print("Woo-hoo! Well done, {}, you have {} GP!".format())
+    print("You now have enough to retire and play video games every day.")
+    print("And it only took you {} days and {} steps! You win!".format(player['day'] and player['steps']))
+    
 
 #--------------------------- MAIN GAME ---------------------------
-initialize_game(resources_map, fog , player)
+
 print("---------------- Welcome to Sundrop Caves! ----------------")
 print("You spent all your money to get the deed to a mine, a small")
 print("  backpack, a simple pickaxe and a magical portal stone.")
@@ -652,80 +660,136 @@ print()
 print("How quickly can you get the 500 GP you need to retire")
 print("  and live happily ever after?")
 print("-----------------------------------------------------------")   
-show_main_menu()
-user_choice = input("Your choice? ")
-stop = False
 
+whole_game_stop = False
+while not(whole_game_stop):
+    show_main_menu()
+    user_choice = input("Your choice? ")
+    stop = False
 
-if user_choice.lower() == "n": 
+    if user_choice.lower() == "n": 
+        resources_map =[]
+        CURRENT_MAP_LAYOUT = [list("################################"),
+                    list("#T?????????????????????????????#"),
+                    list("#??????????????????????????????#"),
+                    list("#??????????????????????????????#"),
+                    list("#??????????????????????????????#"),
+                    list("#??????????????????????????????#"),
+                    list("#??????????????????????????????#"),
+                    list("#??????????????????????????????#"),
+                    list("#??????????????????????????????#"),
+                    list("#??????????????????????????????#"),
+                    list("#??????????????????????????????#"),
+                    list("################################")]
+
+        initialize_game(resources_map,player)
+        NAME = input("Greetings, miner! What is your name? ")
+        print("Pleased to meet you, {}. Welcome tp Sundrop Town!".format(NAME))
+    elif user_choice.lower() == "l":
+        if name_safe == "NA":
+            print('You do not have a save game')
+            continue
+        else:
+            resources_map = []
+            initialize_game_safe_folder(player,player_safe_information,resources_map_safe_file,fog_safe_file)
+    elif user_choice.lower() == "q":
+        whole_game_stop = True
+        continue
     
-    
-    NAME = input("Greetings, miner! What is your name? ")
-    print("Pleased to meet you, {}. Welcome tp Sundrop Town!".format(NAME))
     while not(stop):
-        show_town_menu(player['day'])
-        N_choice = input("Your choice? ")
 
-        if N_choice.lower() == "i":
-            player_information(player)
-        elif N_choice.lower() == "b": 
-            buy_stuff(player)
-        elif N_choice.lower() == "m":
-            
-            map_print_fog()
-        elif N_choice.lower() =='e':
-            print("---------------------------------------------------")
-            print("                     Day{}                         ".format(player['day']))
-            print("---------------------------------------------------")
-            if player['day'] > 1:
-                player['x'] = PORTAL_POSITION_X
-                player['y'] = PORTAL_POSITION_Y
+            if player['gp'] >= 500:
+                end_game(player)
+                stop = True
+                continue
+                
+            show_town_menu(player['day'])
+            choice = input("Your choice? ")
 
-                PORTAL_POSITION_X = 0
-                PORTAL_POSITION_Y = 0
-                CURRENT_MAP_LAYOUT[1].pop(1)
-                resources_map[1].pop(1)
+            if choice.lower() == "i":
+                player_information(player)
+            elif choice.lower() == "b": 
+                buy_stuff(player)
+            elif choice.lower() == "m":   
+                map_print_fog()
+            elif choice.lower() =='e':
+                if player['day'] > 1:
+                    CURRENT_MAP_LAYOUT[1][1]= "T"
+                    resources_map[1][1] ="T"
 
-                CURRENT_MAP_LAYOUT[1].insert(1,"T")
-                resources_map[1].insert(1,"T")
+                print("---------------------------------------------------")
+                print("                     Day{}                         ".format(player['day']))
+                print("---------------------------------------------------")
+                if PORTAL_POSITION_X>1 or PORTAL_POSITION_Y>1:
 
-                CURRENT_MAP_LAYOUT[player['y']].pop(player['x'])
-                resources_map[player['y']].pop(player['x'])
+                    CURRENT_MAP_LAYOUT[PORTAL_POSITION_Y].pop(PORTAL_POSITION_X)
+                    resources_map[PORTAL_POSITION_Y].pop(PORTAL_POSITION_X)
 
-                CURRENT_MAP_LAYOUT[player['y']].insert(player['x'],"M")
-                resources_map[player['y']].insert(player['x'],"M")
-
-
-            enter_stop = False
-            while not(enter_stop):
-
-                print("Day {}".format(player['day']))
-                draw_view(player,resources_map)
-                print(f"Turns left:{player['turns']}    Load:{player['load']} / {CURRENT_BAG_CAPACITY}    Steps:{player['steps']}")
-                print("(WASD) to move")
-                print("(M)ap, (I)nformation, (P)ortal, (Q)uit to main menu")
+                    CURRENT_MAP_LAYOUT[PORTAL_POSITION_Y].insert(PORTAL_POSITION_X,"M")
+                    resources_map[PORTAL_POSITION_Y].insert(PORTAL_POSITION_X,"M")   
+                    PORTAL_POSITION_X = 1
+                    PORTAL_POSITION_Y = 1
 
 
-                user_action = input("Action?")
+                enter_stop = False
+                while not(enter_stop):
+
+                    print("Day {}".format(player['day']))
+                    draw_view(player,resources_map)
+                    print(f"Turns left:{player['turns']}    Load:{player['load']} / {player['current capacity']}    Steps:{player['steps']}")
+                    print("(WASD) to move")
+                    print("(M)ap, (I)nformation, (P)ortal, (Q)uit to main menu")
+
+
+                    user_action = input("Action?")
 
                 
-                if user_action.lower() == 'w' or user_action.lower() =='s' or user_action.lower() == 'a' or user_action.lower() == 'd':
-                    if player['turns'] == 0:
-                        print("You ran out of turns, try again tommorrow.")
+                    if user_action.lower() == 'w' or user_action.lower() =='s' or user_action.lower() == 'a' or user_action.lower() == 'd':
+                        if player['turns'] == 0:
+                            portal(player)
+                            enter_stop = True
+                            continue
+                        else: 
+                            movement_input(player,resources_map,user_action)
+                    elif user_action.lower() == "m":
+                        map_print_fog()
+                    elif user_action.lower() == "q":
+                        enter_stop = True
+                        continue 
+                    elif user_action.lower() == 'p':
+                        portal(player)
+                        enter_stop = True
                         continue
-                    else: 
-                        movement_input(player,resources_map,user_action)
-                elif user_action.lower() == "m":
-                    map_print_fog()
-                elif user_action.lower() == "q":
-                    enter_stop = True
-                    continue 
-                elif user_action.lower() == 'p':
-                    portal(player)
-                    enter_stop = True
-                    continue
-                elif user_action.lower() == "i":
-                    player_in_game_information(player)
+                    elif user_action.lower() == "i":
+                        player_in_game_information(player)
+            elif choice.lower() =="q":
+                stop = True
+                continue
+            elif choice.lower() =="s":
+                player_safe_information['x'] = player['x']
+                player_safe_information['y'] = player['y'] 
+                player_safe_information['copper'] = player['copper'] 
+                player_safe_information['silver'] = player['silver'] 
+                player_safe_information['gold'] = player['gold']
+                player_safe_information['GP'] = player['GP'] 
+                player_safe_information['day'] = player['day']
+                player_safe_information['steps'] = player['steps']
+                player_safe_information['turns'] = TURNS_PER_DAY
+                player_safe_information['load'] = player['load']
+                player_safe_information['gp'] = player['gp'] 
+                player_safe_information['current capacity'] = player['current capacity']
+                player_safe_information['pickaxe level'] = player['pickaxe level']
+                player_safe_information['pickaxe ore'] = player['pickaxe ore']
+                fog_safe_file[0]= CURRENT_MAP_LAYOUT
+                resources_map_safe_file[0] = resources_map
+                name_safe = NAME
+                portal_position_x_safe = PORTAL_POSITION_X
+                portal_position_y_safe = PORTAL_POSITION_Y
+                print("---------------------------------------------------")
+                print("Game has been save successfully!")
+                print("---------------------------------------------------")
+
+
 
 
 
