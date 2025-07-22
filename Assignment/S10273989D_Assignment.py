@@ -211,7 +211,7 @@ def show_town_menu(day):
 def player_information(player): 
 
     print("----- Player Information -----")
-    print("Name: {}".format(NAME))
+    print("Name: {}".format(name))
     print("Portal position: ({},{})".format(PORTAL_POSITION_X-1,PORTAL_POSITION_Y-1))
     print("Pickaxe level: {} ({})".format(player['pickaxe level'],player['pickaxe ore']))
     print("------------------------------")
@@ -409,11 +409,11 @@ def upper_fog_right(player,resources_map):
     current_map_layout[player['y']-1][player['x']+1] = resources_map[player['y']-1][player['x']+1]
 
 def right_side_fog(player,resources_map):
-    global CURRENT_MAP_LAYOUT
+    global current_map_layout
     current_map_layout[player['y']][player['x']+1]= resources_map[player['y']][player['x']+1]
     
 def left_side_fog(player,resources_map): 
-    global CURRENT_MAP_LAYOUT
+    global current_map_layout
     current_map_layout[player['y']][player['x']-1]= resources_map[player['y']][player['x']-1]
     
 def below_fog_right(player,resources_map):
