@@ -5,19 +5,18 @@ path = "C:\\Text Folders\\Assignment 35%\\"
 high_score_days = []
 high_score_steps = []
 player = {}
-name = "NA"
+
 
 player_safe_information = {}
 resources_map_safe_file = []
-name_safe = "NA"
+
 fog_safe_file = []
 portal_position_x_safe = 0
 portal_position_y_safe = 0
 eligible_for_mine = True
 MAP_WIDTH = 0
 MAP_HEIGHT = 0
-PORTAL_POSITION_X = 1
-PORTAL_POSITION_Y = 1
+
 
 
 TURNS_PER_DAY = 20
@@ -38,7 +37,6 @@ current_map_layout = [list("################################"),
                     list("################################")]
 
 def clear_safe_content():
-    global name
     global player_safe_information
     global resources_map_safe_file
     global portal_position_x_safe
@@ -46,13 +44,11 @@ def clear_safe_content():
     global name_safe
     global fog_safe_file
 
-    name_safe = "NA"
+    player['name'] = "NA"
     player_safe_information = {}
     resources_map_safe_file = ["map"]
     portal_position_x_safe = 0
     portal_position_y_safe = 0
-
-
 
 
 def load_map(filename, map_struct,player):
@@ -105,14 +101,15 @@ def map_print_fog():
     print("+")
 
 def initialize_game(resources_map,player):
-    global PORTAL_POSITION_X
-    global PORTAL_POSITION_Y
+
+
+    player['portal x'] = 1
+    player['portal y'] =1
     player['x'] = 1
     player['y'] = 1
     player['copper'] = 0
     player['silver'] = 0
     player['gold'] = 0
-    player['GP'] = 0
     player['day'] = 1
     player['steps'] = 0
     player['turns'] = TURNS_PER_DAY
@@ -121,46 +118,48 @@ def initialize_game(resources_map,player):
     player['pickaxe level'] = 1
     player['current capacity'] = 10
     player['pickaxe ore'] = "copper"
-    player['portal activated'] = False
-    PORTAL_POSITION_X = 1
-    PORTAL_POSITION_Y = 1
+    player['name'] = 'NA'
+    player['portal activated'] = "False"
 
-    
+
     load_map("level1.txt",resources_map,player)
     clear_fog(player,resources_map)
     
-def initialize_game_safe_folder(player,player_safe_information,):
+def initialize_game_safe_folder(player):
     global current_map_layout
-    global PORTAL_POSITION_X
-    global PORTAL_POSITION_Y
-    global name
-    global name_safe
     global resources_map
-    global resources_map_safe_file
-    global fog_safe_file
 
+    current_map_layout.clear()
+    resources_map.clear()
+
+    with open(path + 'fogmap.txt','r') as file:
+        info = file.read().split(",")
+        info.pop(-1)
+        for lines in info:
+            current_map_layout.append(list(lines))
     
-    player['x'] = player_safe_information['x']
-    player['y'] =  player_safe_information['y']
-    player['copper'] = player_safe_information['copper']
-    player['silver'] = player_safe_information['silver']
-    player['gold'] = player_safe_information['gold']
-    player['GP'] = player_safe_information['GP']
-    player['day'] = player_safe_information['day']
-    player['steps'] = player_safe_information['steps'] 
-    player['turns'] = TURNS_PER_DAY
-    player['load'] = player_safe_information['load']
-    player['gp'] = player_safe_information['gp']
-    player['current capacity'] = player_safe_information['current capacity']
-    player['pickaxe level'] = player_safe_information['pickaxe level']
-    player['pickaxe ore'] = player_safe_information['pickaxe ore'] 
-    player['portal activated'] = player_safe_information['portal activated']
+    with open(path + 'resource.txt', 'r') as file_2:
+
+        info_2 = file_2.read().split(',')
+        info_2.pop(-1)
+        for lines in info_2:
+            resources_map.append(list(lines))
     
-    NAME = name_safe
-    resources_map = copy.deepcopy(resources_map_safe_file)
-    current_map_layout = copy.deepcopy(fog_safe_file)
-    PORTAL_POSITION_X = portal_position_x_safe
-    PORTAL_POSITION_Y = portal_position_y_safe
+    with open(path +'values.txt') as file_3:
+
+        info_3 = file_3.readlines()
+
+        for x in range(14):
+            info_split = info_3[x].strip().split(",")
+            player[info_split[0]] = int(info_split[1])
+        
+        for x in range(14,16):
+            info_split_2 = info_3[x].strip().split(",")
+            player[info_split_2[0]] = str(info_split_2[1])
+        
+        info_split_3 = info_3[-1].strip().split(",")
+        player[info_split_3[0]] = str(info_split_3[1])
+
 
 def draw_view (player):
     global current_map_layout
@@ -211,8 +210,8 @@ def show_town_menu(day):
 def player_information(player): 
 
     print("----- Player Information -----")
-    print("Name: {}".format(name))
-    print("Portal position: ({},{})".format(PORTAL_POSITION_X-1,PORTAL_POSITION_Y-1))
+    print("Name: {}".format(player['name']))
+    print("Portal position: ({},{})".format(player['portal x']-1,player['portal y']-1))
     print("Pickaxe level: {} ({})".format(player['pickaxe level'],player['pickaxe ore']))
     print("------------------------------")
     print("Load: {}/{}".format(player['load'],player['current capacity']))
@@ -223,7 +222,7 @@ def player_information(player):
 
 def player_in_game_information(player):
     print("----- Player Information -----")
-    print("Name: {}".format(name))
+    print("Name: {}".format(player['name']))
     print("Current position: ({},{})".format(player['x']-1,player['y']-1))
     print("Pickaxe level: {} ({})".format(player['pickaxe level'],player['pickaxe ore']))
     print("Gold: {}".format(player['gold']))
@@ -616,8 +615,7 @@ def movement_input(player,resources_map,user_input):
         return 
     
 def portal(player): 
-    global PORTAL_POSITION_X
-    global PORTAL_POSITION_Y
+
 
     copper_price_random = randint(1,3)
     silver_price_random = randint(5,8)
@@ -634,8 +632,8 @@ def portal(player):
     current_map_layout[player['y']].insert(player['x'],"P")
     resources_map[player['y']].insert(player['x'],"P")
 
-    PORTAL_POSITION_X = player['x']
-    PORTAL_POSITION_Y = player['y']
+    player['portal x'] = player['x']
+    player['portal y']= player['y']
 
 
     current_map_layout[1].pop(1)
@@ -672,47 +670,35 @@ def portal(player):
     player['silver'] = 0
     player['gold'] = 0
     player['load'] = 0
-    player['portal activated'] = True
+    player['portal activated'] = "True"
     return 
     
 
 def end_game(player):
-    global name
     print("-------------------------------------------------------------")
-    print("Woo-hoo! Well done, {}, you have {} GP!".format(name,player['gp']))
+    print("Woo-hoo! Well done, {}, you have {} GP!".format(player['name'],player['gp']))
     print("You now have enough to retire and play video games every day.")
     print("And it only took you {} days and {} steps! You win!".format(player['day']-1 , player['steps']))
     
-def safe_game(player_safe_information,player):
-            global fog_safe_file
-            global resources_map_safe_file
-            global name_safe
-            global portal_position_x_safe
-            global portal_position_y_safe
-            global resources_map
-            player_safe_information['x'] = player['x']
-            player_safe_information['y'] = player['y'] 
-            player_safe_information['copper'] = player['copper'] 
-            player_safe_information['silver'] = player['silver'] 
-            player_safe_information['gold'] = player['gold']
-            player_safe_information['GP'] = player['GP'] 
-            player_safe_information['day'] = player['day']
-            player_safe_information['steps'] = player['steps']
-            player_safe_information['turns'] = TURNS_PER_DAY
-            player_safe_information['load'] = player['load']
-            player_safe_information['gp'] = player['gp'] 
-            player_safe_information['current capacity'] = player['current capacity']
-            player_safe_information['pickaxe level'] = player['pickaxe level']
-            player_safe_information['pickaxe ore'] = player['pickaxe ore']
-            player_safe_information['portal activated'] = player['portal activated']
-            fog_safe_file = copy.deepcopy(current_map_layout)
-            resources_map_safe_file = copy.deepcopy(resources_map)
-            name_safe = name
-            portal_position_x_safe = PORTAL_POSITION_X
-            portal_position_y_safe = PORTAL_POSITION_Y
-            print("---------------------------------------------------")
-            print("Game has been save successfully!")
-            print("---------------------------------------------------")
+def safe_game():
+            global player
+            with open(path+"values.txt",'w') as file:
+                for x in player.keys():
+                    values = player[x]
+                    file.write("{},{}\n".format(x,str(values)))
+
+            with open(path+"fogmap.txt",'w') as file_2:
+                for lines in current_map_layout:
+                    for char in lines:
+                        file_2.write(char)
+                    file_2.write(",")
+
+            with open(path+"resource.txt","w") as file_3:
+                for lines in resources_map:
+                    for char in lines:
+                        file_3.write(char)
+                    file_3.write(",")
+
 
 # def rearrange_score(high_score_days,high_score_steps):
 
@@ -748,15 +734,15 @@ while not(whole_game_stop):
                     list("################################")]
 
         initialize_game(resources_map,player)
-        name = input("Greetings, miner! What is your name? ")
-        print("Pleased to meet you, {}. Welcome tp Sundrop Town!".format(name))
+        player['name'] = input("Greetings, miner! What is your name? ")
+        print("Pleased to meet you, {}. Welcome to Sundrop Town!".format(player['name']))
     elif user_choice.lower() == "l":
-        if name_safe == "NA":
+        if player['name'] == "NA": # care later
             print('You do not have a save game')
             continue
         else:
             resources_map = []
-            initialize_game_safe_folder(player,player_safe_information)
+            initialize_game_safe_folder(player)
     # elif user_choice.lower() =="h":
 
     elif user_choice.lower() == "q":
@@ -790,16 +776,16 @@ while not(whole_game_stop):
                 print("---------------------------------------------------")
                 print("                     Day{}                         ".format(player['day']))
                 print("---------------------------------------------------")
-                if player['portal activated'] == True:
+                if player['portal activated'] == "True":
 
-                    current_map_layout[PORTAL_POSITION_Y].pop(PORTAL_POSITION_X)
-                    resources_map[PORTAL_POSITION_Y].pop(PORTAL_POSITION_X)
+                    current_map_layout[player['portal y']].pop(player['portal x'])
+                    resources_map[player['portal y']].pop(player['portal x'])
 
-                    current_map_layout[PORTAL_POSITION_Y].insert(PORTAL_POSITION_X,"M")
-                    resources_map[PORTAL_POSITION_Y].insert(PORTAL_POSITION_X,"M")   
-                    PORTAL_POSITION_X = 1
-                    PORTAL_POSITION_Y = 1
-                    player['portal activated'] = False
+                    current_map_layout[player['portal y']].insert(player['portal x'],"M")
+                    resources_map[player['portal y']].insert(player['portal x'],"M")   
+                    player['portal x'] = 1
+                    player['portal y'] = 1
+                    player['portal activated'] = "False"
 
 
                 enter_stop = False
@@ -838,7 +824,7 @@ while not(whole_game_stop):
                 stop = True
                 continue
             elif choice.lower() =="v":
-                safe_game(player_safe_information,player)
+                safe_game()
 
 
 
