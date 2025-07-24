@@ -6,7 +6,7 @@ def empty_file_check(filename):
         if info == "": 
             return "Empty File"
 
-
+cannot_buy = False
 def read_snacks_file(filename):
     """Read snacks and their prices from the file and return two separate lists:
     one for names and one for prices."""
@@ -24,16 +24,17 @@ def read_snacks_file(filename):
             
 
 def get_valid_budget(list):
+    global cannot_buy
     """Prompt the user for a valid snack budget (greater than 0)."""
-    while True:
-        budget = float(input("Enter your snack budget: "))
-        lowest_cost = 10000
-        for price in list: 
-            if price < lowest_cost:
+    budget = float(input("Enter your snack budget: "))
+    lowest_cost = 10000
+    for price in list: 
+        if price < lowest_cost:
                 lowest_cost = price
-        if budget < lowest_cost:
+    if budget < lowest_cost:
             print("Your budget is too low! Try asking the office for a raise.")
-        else:
+            cannot_buy = True
+    else:
             return budget
 
 def classify_snack(price):
@@ -68,16 +69,18 @@ while not(stop):
 
     snack_names,snack_prices = read_snacks_file("snack_price.txt")
     budget = get_valid_budget(snack_prices)
-    eligible_list = eligible_snacks(budget)
 
-    print('Here is what you can buy:')
-    for x in range(len(eligible_list)): 
-        print("- {} (${:.2f}) - {}".format(eligible_list[x][0],eligible_list[x][1],classify_snack(eligible_list[x][1])))
+
+    if cannot_buy == False:
+        eligible_list = eligible_snacks(budget)
+        print('Here is what you can buy:')
+        for x in range(len(eligible_list)): 
+            print("- {} (${:.2f}) - {}".format(eligible_list[x][0],eligible_list[x][1],classify_snack(eligible_list[x][1])))
     
-    with open(path + "snack-list.txt",'w') as file: 
-        for y in range(len(eligible_list)):
-            file.write("{},{:.2f}\n".format(eligible_list[y][0],eligible_list[y][1]))
-    print('Your snack list has been saved to \'snack_list.txt\'')
+        with open(path + "snack-list.txt",'w') as file: 
+            for y in range(len(eligible_list)):
+                file.write("{},{:.2f}\n".format(eligible_list[y][0],eligible_list[y][1]))
+        print('Your snack list has been saved to \'snack_list.txt\'')
     stop = True
 
 
