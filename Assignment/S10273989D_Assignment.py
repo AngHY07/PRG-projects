@@ -774,8 +774,8 @@ while not(whole_game_stop):
         elif user_choice.lower() == "h":
             rearrange_score()
             print("{}    {}    {}    {}".format("Names",'Days','Steps','GP'))
-            for char in high_score_content:
-                print("{}    {}    {}    {}".format(char[0],char[1],char[2],char[3]))
+            for i in range(len(high_score_content)):
+                print("{}    {}    {}    {}".format(high_score_content[i][0],high_score_content[i][1],high_score_content[i][2],high_score_content[i][3]))
     else: 
         print("Your input is not valid!")
         continue
