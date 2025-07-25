@@ -1,22 +1,14 @@
 from random import randint
-import copy
+import secrets
 path = "C:\\Text Folders\\Assignment 35%\\"
 
-high_score_days = []
-high_score_steps = []
+high_score_content = []
 player = {}
 
 
-player_safe_information = {}
-resources_map_safe_file = []
-
-fog_safe_file = []
-portal_position_x_safe = 0
-portal_position_y_safe = 0
 eligible_for_mine = True
 MAP_WIDTH = 0
 MAP_HEIGHT = 0
-
 
 
 TURNS_PER_DAY = 20
@@ -49,7 +41,6 @@ def clear_safe_content():
     resources_map_safe_file = ["map"]
     portal_position_x_safe = 0
     portal_position_y_safe = 0
-
 
 def load_map(filename, map_struct,player):
     map_file = open(path + filename, 'r')
@@ -102,7 +93,7 @@ def map_print_fog():
 
 def initialize_game(resources_map,player):
 
-
+    player['high score count'] = 0 
     player['portal x'] = 1
     player['portal y'] =1
     player['x'] = 1
@@ -149,17 +140,13 @@ def initialize_game_safe_folder(player):
 
         info_3 = file_3.readlines()
 
-        for x in range(14):
+        for x in range(15):
             info_split = info_3[x].strip().split(",")
             player[info_split[0]] = int(info_split[1])
         
-        for x in range(14,16):
+        for x in range(15,18):
             info_split_2 = info_3[x].strip().split(",")
             player[info_split_2[0]] = str(info_split_2[1])
-        
-        info_split_3 = info_3[-1].strip().split(",")
-        player[info_split_3[0]] = str(info_split_3[1])
-
 
 def draw_view (player):
     global current_map_layout
@@ -699,8 +686,50 @@ def safe_game():
                         file_3.write(char)
                     file_3.write(",")
 
+# #data.sort(key=lambda x: x[0])
+def rearrange_score():
+    global high_score_content
 
-# def rearrange_score(high_score_days,high_score_steps):
+    high_score_content.sort(key=lambda x:x[1])
+    changes_days = True
+
+    while changes_days: 
+        changes_days = False
+
+        for x in range(len(high_score_content)):
+            if high_score_content[x][4]== high_score_content[-1][4]:
+                continue
+            
+            if high_score_content[x][1] == high_score_content[x+1][1]:
+                temp = "NA"
+                if high_score_content[x][2] < high_score_content[x+1][2]:
+                    temp = high_score_content[x+1]
+                    high_score_content.pop(x+1)
+                    high_score_content.insert(x,temp)
+                    changes_days = True
+    
+    changes_steps = True
+
+    while changes_steps:
+        changes_steps = False
+
+        for y in range(len(high_score_content)):
+            if high_score_content[y][4]== high_score_content[-1][4]:
+                continue
+            
+            if high_score_content[y][2] == high_score_content[y+1][2]:
+                temp_2 = "NA"
+                if high_score_content[y][3]< high_score_content[y+1][3]:
+                    temp_2 = high_score_content[y+1]
+                    high_score_content.pop(y+1)
+                    high_score_content.insert(y,temp_2)
+                    changes_steps = True
+
+
+
+
+    
+
 
 #--------------------------- MAIN GAME ---------------------------
 
@@ -718,9 +747,10 @@ while not(whole_game_stop):
     user_choice = input("Your choice? ")
     stop = False
 
-    if user_choice.lower() == "n": 
-        resources_map =[]
-        current_map_layout = [list("################################"),
+    if user_choice.lower() == "n" or user_choice.lower()=="l" or user_choice.lower() =="q" or user_choice.lower =="h":
+        if user_choice.lower() == "n": 
+            resources_map =[]
+            current_map_layout = [list("################################"),
                     list("#T?????????????????????????????#"),
                     list("#??????????????????????????????#"),
                     list("#??????????????????????????????#"),
@@ -732,100 +762,110 @@ while not(whole_game_stop):
                     list("#??????????????????????????????#"),
                     list("#??????????????????????????????#"),
                     list("################################")]
-
-        initialize_game(resources_map,player)
-        player['name'] = input("Greetings, miner! What is your name? ")
-        print("Pleased to meet you, {}. Welcome to Sundrop Town!".format(player['name']))
-    elif user_choice.lower() == "l":
-        if player['name'] == "NA": # care later
-            print('You do not have a save game')
-            continue
-        else:
-            resources_map = []
+            initialize_game(resources_map,player)
+            player['name'] = input("Greetings, miner! What is your name? ")
+            print("Pleased to meet you, {}. Welcome to Sundrop Town!".format(player['name']))
+        elif user_choice.lower() == "l":
+            initialize_game(resources_map,player)
             initialize_game_safe_folder(player)
-    # elif user_choice.lower() =="h":
-
-    elif user_choice.lower() == "q":
-        whole_game_stop = True
+        elif user_choice.lower() == "q":
+            whole_game_stop = True
+            continue
+        elif user_choice.lower() == "h":
+            rearrange_score()
+            print("{}    {}    {}    {}".format("Names",'Days','Steps','GP'))
+            for char in high_score_content:
+                print("{}    {}    {}    {}".format(char[0],char[1],char[2],char[3]))
+    else: 
+        print("Your input is not valid!")
         continue
 
     while not(stop):
-
+            secret = str(secret.token_hex(4))
             if player['gp'] >= 500:
                 end_game(player)
-                high_score_days.append(player['day'])
-                high_score_steps.append(player['steps'])
-                # clear_safe_content()
+                high_score_content.append(list())
+                high_score_content[player['high score count']].append(player['names'])
+                high_score_content[player['high score count']].append(player['day'])
+                high_score_content[player['high score count']].append(player['steps'])
+                high_score_content[player['high score count']].append(player['gp'])
+                high_score_content[player['high score count']].append(secret)
                 stop = True
                 continue
                 
             show_town_menu(player['day'])
             choice = input("Your choice? ")
 
-            if choice.lower() == "i":
-                player_information(player)
-            elif choice.lower() == "b": 
-                buy_stuff(player)
-            elif choice.lower() == "m":   
-                map_print_fog()
-            elif choice.lower() =='e':
-                if player['day'] > 1:
-                    current_map_layout[1][1]= "T"
-                    resources_map[1][1] ="T"
-
-                print("---------------------------------------------------")
-                print("                     Day{}                         ".format(player['day']))
-                print("---------------------------------------------------")
-                if player['portal activated'] == "True":
-
-                    current_map_layout[player['portal y']].pop(player['portal x'])
-                    resources_map[player['portal y']].pop(player['portal x'])
-
-                    current_map_layout[player['portal y']].insert(player['portal x'],"M")
-                    resources_map[player['portal y']].insert(player['portal x'],"M")   
-                    player['portal x'] = 1
-                    player['portal y'] = 1
-                    player['portal activated'] = "False"
-
-
-                enter_stop = False
-                while not(enter_stop):
-
-                    print("Day {}".format(player['day']))
-                    draw_view(player)
-                    print(f"Turns left:{player['turns']}    Load:{player['load']} / {player['current capacity']}    Steps:{player['steps']}")
-                    print("(WASD) to move")
-                    print("(M)ap, (I)nformation, (P)ortal, (Q)uit to main menu")
-
-
-                    user_action = input("Action?")
-
+            if choice.lower() == "i" or choice.lower() == "b" or choice.lower() == "m" or choice.lower() == "e" or choice.lower() == "q" or choice.lower()=="v":
                 
-                    if user_action.lower() == 'w' or user_action.lower() =='s' or user_action.lower() == 'a' or user_action.lower() == 'd':
-                        if player['turns'] == 0:
+                if choice.lower() == "i":
+                    player_information(player)
+                elif choice.lower() == "b": 
+                    buy_stuff(player)
+                elif choice.lower() == "m":   
+                    map_print_fog()
+                elif choice.lower() =='e':
+                    if player['day'] > 1:
+                        current_map_layout[1][1]= "T"
+                        resources_map[1][1] ="T"
+
+                    print("---------------------------------------------------")
+                    print("                     Day{}                         ".format(player['day']))
+                    print("---------------------------------------------------")
+                    if player['portal activated'] == "True":
+
+                        current_map_layout[player['portal y']].pop(player['portal x'])
+                        resources_map[player['portal y']].pop(player['portal x'])
+
+                        current_map_layout[player['portal y']].insert(player['portal x'],"M")
+                        resources_map[player['portal y']].insert(player['portal x'],"M")   
+                        player['portal x'] = 1
+                        player['portal y'] = 1
+                        player['portal activated'] = "False"
+
+
+                    enter_stop = False
+                    while not(enter_stop):
+
+                        print("Day {}".format(player['day']))
+                        draw_view(player)
+                        print(f"Turns left:{player['turns']}    Load:{player['load']} / {player['current capacity']}    Steps:{player['steps']}")
+                        print("(WASD) to move")
+                        print("(M)ap, (I)nformation, (P)ortal, (Q)uit to main menu")
+
+
+                        user_action = input("Action?")
+                        if user_action.lower() == 'w' or user_action.lower() =='s' or user_action.lower() == 'a' or user_action.lower() == 'd':
+                            if player['turns'] == 0:
+                                portal(player)
+                                enter_stop = True
+                                continue
+                            else: 
+                                movement_input(player,resources_map,user_action)
+                                eligible_for_mine = True
+                        elif user_action.lower() == "m":
+                            map_print_fog()
+                        elif user_action.lower() == "q":
+                            enter_stop = True
+                            continue 
+                        elif user_action.lower() == 'p':
                             portal(player)
                             enter_stop = True
                             continue
+                        elif user_action.lower() == "i":
+                            player_in_game_information(player)
                         else: 
-                            movement_input(player,resources_map,user_action)
-                            eligible_for_mine = True
-                    elif user_action.lower() == "m":
-                        map_print_fog()
-                    elif user_action.lower() == "q":
-                        enter_stop = True
-                        continue 
-                    elif user_action.lower() == 'p':
-                        portal(player)
-                        enter_stop = True
-                        continue
-                    elif user_action.lower() == "i":
-                        player_in_game_information(player)
-            elif choice.lower() =="q":
-                stop = True
+                            print("Invalid input!")
+                            continue
+                elif choice.lower() =="q":
+                    stop = True
+                    continue
+                elif choice.lower() =="v":
+                    safe_game()
+                    print("Game has been saved successfully")
+            else: 
+                print("Input is not valid!")
                 continue
-            elif choice.lower() =="v":
-                safe_game()
-
 
 
 
