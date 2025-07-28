@@ -727,10 +727,6 @@ def rearrange_score():
 
 
 
-
-    
-
-
 #--------------------------- MAIN GAME ---------------------------
 
 print("---------------- Welcome to Sundrop Caves! ----------------")
@@ -773,15 +769,23 @@ while not(whole_game_stop):
             continue
         elif user_choice.lower() == "h":
             rearrange_score()
-            print("{}    {}    {}    {}".format("Names",'Days','Steps','GP'))
-            for i in range(len(high_score_content)):
-                print("{}    {}    {}    {}".format(high_score_content[i][0],high_score_content[i][1],high_score_content[i][2],high_score_content[i][3]))
+            if len(high_score_content) < 5: 
+                print_length = len(high_score_content)
+                print_string = len(high_score_content)
+            else: 
+                print_length = 5
+                print_string = 5
+    
+            print('Top {} High Score'.format(print_string))
+            print("{:<8}    {:<4}    {:<5}    {}".format("Names",'Days','Steps','GP'))
+            for i in range(print_length):
+                print("{:<8}    {:>4}    {:>5}    {}".format(high_score_content[i][0],high_score_content[i][1],high_score_content[i][2],high_score_content[i][3]))
     else: 
         print("Your input is not valid!")
         continue
 
     while not(stop):
-            secret = str(secret.token_hex(4))
+            unique_identifier = str(secrets.token_hex(4))
             if player['gp'] >= 500:
                 end_game(player)
                 high_score_content.append(list())
@@ -789,7 +793,7 @@ while not(whole_game_stop):
                 high_score_content[player['high score count']].append(player['day'])
                 high_score_content[player['high score count']].append(player['steps'])
                 high_score_content[player['high score count']].append(player['gp'])
-                high_score_content[player['high score count']].append(secret)
+                high_score_content[player['high score count']].append(unique_identifier)
                 stop = True
                 continue
                 
