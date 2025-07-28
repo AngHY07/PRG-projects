@@ -223,15 +223,18 @@ def player_in_game_information(player):
     print("------------------------------")
     
 def buy_stuff(player):
-
+    print("----------------------- Shop Menu -------------------------")
     if player['pickaxe level'] == 1:
                 upgrade_ore = "silver"
                 upgrade_price = 50
+                print("(P) ickaxe upgrade to Level {} to mine {} ore for {} GP".format(player['pickaxe level']+1,upgrade_ore,upgrade_price))
     elif player['pickaxe level'] == 2:
                 upgrade_ore = "gold"
                 upgrade_price = 150
-    print("----------------------- Shop Menu -------------------------")
-    print("(P) ickaxe upgrade to Level {} to mine {} ore for {} GP".format(player['pickaxe level']+1,upgrade_ore,upgrade_price))
+                print("(P) ickaxe upgrade to Level {} to mine {} ore for {} GP".format(player['pickaxe level']+1,upgrade_ore,upgrade_price))
+    elif  player['pickaxe level'] == 3: 
+                print("(P) Pickaxe level maxed out")
+
     print("(B) ackpack upgrade to carry {} items for {} GP".format((player['current capacity']+2),(player['current capacity']*2)))
     print("(L) eave shop")
     print("-----------------------------------------------------------")
@@ -241,7 +244,6 @@ def buy_stuff(player):
 
     if buy_1st_choice.lower() == "b":
         while True: 
-            
             print("----------------------- Shop Menu -------------------------")
             print("(B) ackpack upgrade to carry {} items for {} GP".format((player['current capacity']+2),(player['current capacity']*2)))
             print("(L) eave shop") 
@@ -262,12 +264,20 @@ def buy_stuff(player):
     
     elif buy_1st_choice.lower() == "p":
         while True : 
+
             if player['pickaxe level'] == 1:
                 upgrade_ore = "silver"
                 upgrade_price = 50
             elif player['pickaxe level'] == 2:
                 upgrade_ore = "gold"
                 upgrade_price = 150
+            elif player['pickaxe level'] == 3: 
+                print("----------------------------------------------------------")
+                print("You have maxed out the pickaxe level. Congrats!")
+                print("----------------------------------------------------------")
+                return
+
+            
             print("----------------------- Shop Menu -------------------------")
             print("(P) ickaxe upgrade to Level {} to mine {} ore for {} GP".format(player['pickaxe level']+1,upgrade_ore,upgrade_price))
             print("(L) eave shop") 
@@ -276,7 +286,7 @@ def buy_stuff(player):
             print("----------------------------------------------------------")
             buy_2nd_choice = input("Your choice? ")
             if buy_2nd_choice.lower() == "l":
-                return None
+                return 
             elif buy_2nd_choice.lower()=="p": 
                 if player['gp']<upgrade_price:
                     print("You do not have enough GP! Come back again later.")
@@ -631,7 +641,7 @@ def portal(player):
 
 
     print("-----------------------------------------------------")
-    if player['turns'] == 0:
+    if player['turns'] == 1:
         print("You can't carry any more, so you can't go that way.")
         print("You are exhausted.")
     print("You place your portal stone here and zap back to town.")
@@ -745,8 +755,8 @@ while not(whole_game_stop):
 
     if user_choice.lower() == "n" or user_choice.lower()=="l" or user_choice.lower() =="q" or user_choice.lower =="h":
         if user_choice.lower() == "n": 
-            resources_map =[]
-            current_map_layout = [list("################################"),
+            resources_map.clear()
+            current_map_layout = [list("################################"), # resert the current_map_layout
                     list("#T?????????????????????????????#"),
                     list("#??????????????????????????????#"),
                     list("#??????????????????????????????#"),
@@ -762,8 +772,8 @@ while not(whole_game_stop):
             player['name'] = input("Greetings, miner! What is your name? ")
             print("Pleased to meet you, {}. Welcome to Sundrop Town!".format(player['name']))
         elif user_choice.lower() == "l":
-            initialize_game(resources_map,player)
-            initialize_game_safe_folder(player)
+            initialize_game(resources_map,player) #initialize all the dictionarys names 
+            initialize_game_safe_folder(player) #this is to pull the informations from the save folder 
         elif user_choice.lower() == "q":
             whole_game_stop = True
             continue
@@ -789,7 +799,7 @@ while not(whole_game_stop):
             if player['gp'] >= 500:
                 end_game(player)
                 high_score_content.append(list())
-                high_score_content[player['high score count']].append(player['names'])
+                high_score_content[player['high score count']].append(player['name'])
                 high_score_content[player['high score count']].append(player['day'])
                 high_score_content[player['high score count']].append(player['steps'])
                 high_score_content[player['high score count']].append(player['gp'])
@@ -840,7 +850,7 @@ while not(whole_game_stop):
 
                         user_action = input("Action?")
                         if user_action.lower() == 'w' or user_action.lower() =='s' or user_action.lower() == 'a' or user_action.lower() == 'd':
-                            if player['turns'] == 0:
+                            if player['turns'] == 1:
                                 portal(player)
                                 enter_stop = True
                                 continue
