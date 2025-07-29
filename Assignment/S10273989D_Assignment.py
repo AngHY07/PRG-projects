@@ -1,5 +1,6 @@
 from random import randint
 import secrets
+import copy
 path = "C:\\Text Folders\\Assignment 35%\\"
 
 high_score_content = []
@@ -14,6 +15,7 @@ MAP_HEIGHT = 0
 TURNS_PER_DAY = 20
 WIN_GP = 500
 
+twenty_percent_list = []
 resources_map = []
 current_map_layout = [list("################################"),
                     list("#T?????????????????????????????#"),
@@ -27,6 +29,8 @@ current_map_layout = [list("################################"),
                     list("#??????????????????????????????#"),
                     list("#??????????????????????????????#"),
                     list("################################")]
+
+twenty_percent_list = []
 
 def clear_safe_content():
     global player_safe_information
@@ -113,15 +117,18 @@ def initialize_game(resources_map,player):
     player['portal activated'] = "False"
 
 
+
     load_map("level1.txt",resources_map,player)
     clear_fog(player,resources_map)
-    
+   
 def initialize_game_safe_folder(player):
     global current_map_layout
     global resources_map
+    global twenty_percent_list
 
     current_map_layout.clear()
     resources_map.clear()
+    twenty_percent_list.clear()
 
     with open(path + 'fogmap.txt','r') as file:
         info = file.read().split(",")
@@ -135,7 +142,8 @@ def initialize_game_safe_folder(player):
         info_2.pop(-1)
         for lines in info_2:
             resources_map.append(list(lines))
-    
+
+
     with open(path +'values.txt') as file_3:
 
         info_3 = file_3.readlines()
@@ -147,6 +155,16 @@ def initialize_game_safe_folder(player):
         for x in range(15,18):
             info_split_2 = info_3[x].strip().split(",")
             player[info_split_2[0]] = str(info_split_2[1])
+    
+    with open(path + "twenty.txt") as file_4: 
+        
+        for lines in file_4: 
+            line_split = lines.strip().split(',')
+            add_list = []
+            add_list.append(line_split[0])
+            add_list.append(int(line_split[1]))
+            add_list.append(int(line_split[2]))
+
 
 def draw_view (player):
     global current_map_layout
@@ -298,8 +316,10 @@ def buy_stuff(player):
 
 def ore_mining_w_s(player,value,copper_random,silver_random,gold_random):
     global eligible_for_mine
+    global twenty_percent_list
+
     if resources_map[player['y']+value][player['x']] == "C":
-            print("---------------------------------------------------")
+            print("\n---------------------------------------------------")
             print("You mined {} piece(s) of copper.".format(copper_random))
 
             if (player['load']+copper_random) > player['current capacity']:
@@ -310,13 +330,18 @@ def ore_mining_w_s(player,value,copper_random,silver_random,gold_random):
             else :
                 player['load'] += copper_random
                 player['copper'] += copper_random
-
+            append_list = []
+            append_list.append("C")
+            append_list.append(player['y']+value)
+            append_list.append(player['x'])
+            twenty_percent_list.append(append_list)
+            
     elif resources_map[player['y']+value][player['x']] == "S":
             if player['pickaxe level'] == 1:
                 print("Your pickaxe level is not high enough to mine this ore!")
                 eligible_for_mine = False
             else:
-                print("---------------------------------------------------")
+                print("\n---------------------------------------------------")
                 print("You mined {} piece(s) of silver.".format(silver_random))
 
                 if (player['load']+silver_random) > player['current capacity']:
@@ -327,13 +352,19 @@ def ore_mining_w_s(player,value,copper_random,silver_random,gold_random):
                 else :
                     player['load'] += silver_random
                     player['silver'] += silver_random
+                append_list = []
+                append_list.append("S")
+                append_list.append(player['y']+value)
+                append_list.append(player['x'])
+                twenty_percent_list.append(append_list)
+
             
     elif resources_map[player['y']+value][player['x']] == "G":
             if player['pickaxe level'] < 3:
                 print("Your pickaxe level is not high enough to mine this ore!")
                 eligible_for_mine = False
             else: 
-                print("---------------------------------------------------")
+                print("\n---------------------------------------------------")
                 print("You mined {} piece(s) of gold.".format(gold_random))
 
                 if (player['load']+gold_random) > player['current capacity']:
@@ -344,12 +375,17 @@ def ore_mining_w_s(player,value,copper_random,silver_random,gold_random):
                 else :
                     player['load'] += gold_random
                     player['gold'] += gold_random
+                append_list = []
+                append_list.append("G")
+                append_list.append(player['y']+value)
+                append_list.append(player['x'])
+                twenty_percent_list.append(append_list)
 
 def ore_mining_a_d(player,value,copper_random,silver_random,gold_random):
     global eligible_for_mine
 
     if resources_map[player['y']][player['x']+value] == "C":
-            print("---------------------------------------------------")
+            print("\n---------------------------------------------------")
             print("You mined {} piece(s) of copper.".format(copper_random))
 
             if (player['load']+copper_random) > player['current capacity']:
@@ -357,16 +393,20 @@ def ore_mining_a_d(player,value,copper_random,silver_random,gold_random):
                 print("... but you can only carry {} more piece(s)!".format(remaining_slots))
                 player['load'] = player['current capacity']
                 player['copper'] += remaining_slots
-
             else :
                 player['load'] += copper_random
                 player['copper'] += copper_random
+            append_list = []
+            append_list.append("C")
+            append_list.append(player['y'])
+            append_list.append(player['x']+value)
+            twenty_percent_list.append(append_list)
     elif resources_map[player['y']][player['x']+value] == "S":
             if player['pickaxe level'] == 1:
                 print("Your pickaxe level is not high enough to mine this ore!")
                 eligible_for_mine = False
             else:  
-                print("---------------------------------------------------")
+                print("\n---------------------------------------------------")
                 print("You mined {} piece(s) of silver.".format(silver_random))
 
                 if (player['load']+silver_random) > player['current capacity']:
@@ -377,12 +417,16 @@ def ore_mining_a_d(player,value,copper_random,silver_random,gold_random):
                 else :
                     player['load'] += silver_random
                     player['silver'] += silver_random
+            append_list = []
+            append_list.append("S")
+            append_list.append(player['y'])
+            twenty_percent_list.append(append_list)
     elif resources_map[player['y']][player['x']+value] == "G":
             if player['pickaxe level'] < 3:
                 print("Your pickaxe level is not high enough to mine this ore!")
                 eligible_for_mine = False
             else:
-                print("---------------------------------------------------")
+                print("\n---------------------------------------------------")
                 print("You mined {} piece(s) of gold.".format(gold_random))
 
                 if (player['load']+gold_random) > player['current capacity']:
@@ -393,6 +437,11 @@ def ore_mining_a_d(player,value,copper_random,silver_random,gold_random):
                 else :
                     player['load'] += gold_random
                     player['gold'] += gold_random
+            append_list = []
+            append_list.append("G")
+            append_list.append(player['y'])
+            append_list.append(player['x']+value)
+            twenty_percent_list.append(append_list)
 
 def upper_fog_left(player,resources_map):
     global current_map_layout
@@ -657,6 +706,7 @@ def portal(player):
     if player['gold'] >0:
         gold_earning = player['gold']*gold_price_random
         print("You sell {} gold ore for {} GP.".format(player['gold'],gold_earning))
+
         
     total_earning = copper_earning+silver_earning+gold_earning
     player['gp'] += total_earning
@@ -668,6 +718,19 @@ def portal(player):
     player['gold'] = 0
     player['load'] = 0
     player['portal activated'] = "True"
+
+    random_change = randint(1,5)
+
+    if twenty_percent_list != []:
+        if random_change == 1:
+            for x in range(len(twenty_percent_list)):
+                resources_map[twenty_percent_list[x][1]][twenty_percent_list[x][2]] = twenty_percent_list[x][0]
+                current_map_layout[twenty_percent_list[x][1]][twenty_percent_list[x][2]] = twenty_percent_list[x][0]
+            print("You are lucky! The ore you mined the previous day has been refreshed!")
+    twenty_percent_list.clear()
+
+    current_map_layout[player['portal y']][player['portal x']] = "P"
+    resources_map[player['portal y']][player['portal x']] = "P"
     return 
     
 
@@ -695,6 +758,18 @@ def safe_game():
                     for char in lines:
                         file_3.write(char)
                     file_3.write(",")
+            
+            with open(path + "twenty.txt",'w') as file_4: 
+                for char in twenty_percent_list: 
+                    file_4.write(char[0])
+                    file_4.write(',')
+                    file_4.write(str(char[1]))
+                    file_4.write(',')
+                    file_4.write(str(char[2]))
+                    file_4.write("\n")
+    
+            
+
 
 
 def rearrange_score():
@@ -806,7 +881,8 @@ while not(whole_game_stop):
                 high_score_content[player['high score count']].append(unique_identifier)
                 stop = True
                 continue
-                
+
+            
             show_town_menu(player['day'])
             choice = input("Your choice? ")
 
@@ -826,6 +902,7 @@ while not(whole_game_stop):
                     print("---------------------------------------------------")
                     print("                     Day{}                         ".format(player['day']))
                     print("---------------------------------------------------")
+
                     if player['portal activated'] == "True":
 
                         current_map_layout[player['portal y']].pop(player['portal x'])
