@@ -167,7 +167,7 @@ def initialize_game_safe_folder(player):
             add_list.append(int(line_split[1]))
             add_list.append(int(line_split[2]))
 
-    with open(path + 'highscore.txt','r') as file_5: 
+    with open(path + 'high_score.txt','r') as file_5: 
 
         for lines in file_5: 
             informations_split = lines.strip().split(',')
