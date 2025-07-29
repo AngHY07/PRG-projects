@@ -166,8 +166,8 @@ def initialize_game_safe_folder(player):
             add_list.append(line_split[0])
             add_list.append(int(line_split[1]))
             add_list.append(int(line_split[2]))
-
-    with open(path + 'high_score.txt','r') as file_5: 
+            twenty_percent_list.append(add_list)
+    with open(path + 'highscore.txt','r') as file_5: 
 
         for lines in file_5: 
             informations_split = lines.strip().split(',')
@@ -177,6 +177,7 @@ def initialize_game_safe_folder(player):
             addition_list.append(int(informations_split[2]))
             addition_list.append(int(informations_split[3]))
             addition_list.append(informations_split[4])
+            high_score_content.append(addition_list)
 
 def draw_view (player):
     global current_map_layout
