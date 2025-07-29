@@ -1,6 +1,6 @@
 from random import randint
 import secrets
-import copy
+
 path = "C:\\Text Folders\\Assignment 35%\\"
 
 high_score_content = []
@@ -125,10 +125,12 @@ def initialize_game_safe_folder(player):
     global current_map_layout
     global resources_map
     global twenty_percent_list
+    global high_score_content
 
     current_map_layout.clear()
     resources_map.clear()
     twenty_percent_list.clear()
+    high_score_content.clear()
 
     with open(path + 'fogmap.txt','r') as file:
         info = file.read().split(",")
@@ -165,6 +167,16 @@ def initialize_game_safe_folder(player):
             add_list.append(int(line_split[1]))
             add_list.append(int(line_split[2]))
 
+    with open(path + 'highscore.txt','r') as file_5: 
+
+        for lines in file_5: 
+            informations_split = lines.strip().split(',')
+            addition_list = []
+            addition_list.append(informations_split[0])
+            addition_list.append(int(informations_split[1]))
+            addition_list.append(int(informations_split[2]))
+            addition_list.append(int(informations_split[3]))
+            addition_list.append(informations_split[4])
 
 def draw_view (player):
     global current_map_layout
@@ -733,7 +745,6 @@ def portal(player):
     resources_map[player['portal y']][player['portal x']] = "P"
     return 
     
-
 def end_game(player):
     print("-------------------------------------------------------------")
     print("Woo-hoo! Well done, {}, you have {} GP!".format(player['name'],player['gp']))
@@ -767,11 +778,20 @@ def safe_game():
                     file_4.write(',')
                     file_4.write(str(char[2]))
                     file_4.write("\n")
-    
             
-
-
-
+            with open(path + "highscore.txt",'w') as file_5: 
+                for char in high_score_content: 
+                    file_5.write(char[0])
+                    file_5.write(',')
+                    file_5.write(str(char[1]))
+                    file_5.write(',')
+                    file_5.write(str(char[2]))
+                    file_5.write(',')
+                    file_5.write(str(char[3]))
+                    file_5.write(',')
+                    file_5.write(str(char[4]))
+                    file_5.write('\n')
+       
 def rearrange_score():
     global high_score_content
 
@@ -828,8 +848,7 @@ while not(whole_game_stop):
     user_choice = input("Your choice? ")
     stop = False
 
-    if user_choice.lower() == "n" or user_choice.lower()=="l" or user_choice.lower() =="q" or user_choice.lower =="h":
-        if user_choice.lower() == "n": 
+    if user_choice.lower() == "n": 
             resources_map.clear()
             current_map_layout = [list("################################"), # resert the current_map_layout
                     list("#T?????????????????????????????#"),
@@ -846,13 +865,16 @@ while not(whole_game_stop):
             initialize_game(resources_map,player)
             player['name'] = input("Greetings, miner! What is your name? ")
             print("Pleased to meet you, {}. Welcome to Sundrop Town!".format(player['name']))
-        elif user_choice.lower() == "l":
+    elif user_choice.lower() == "l":
             initialize_game(resources_map,player) #initialize all the dictionarys names 
             initialize_game_safe_folder(player) #this is to pull the informations from the save folder 
-        elif user_choice.lower() == "q":
+    elif user_choice.lower() == "q":
             whole_game_stop = True
             continue
-        elif user_choice.lower() == "h":
+    elif user_choice.lower() == "h":
+            if high_score_content == []:
+                print("You have not had records of your completion yet!")
+                continue
             rearrange_score()
             if len(high_score_content) < 5: 
                 print_length = len(high_score_content)
@@ -866,8 +888,8 @@ while not(whole_game_stop):
             for i in range(print_length):
                 print("{:<8}    {:>4}    {:>5}    {}".format(high_score_content[i][0],high_score_content[i][1],high_score_content[i][2],high_score_content[i][3]))
     else: 
-        print("Your input is not valid!")
-        continue
+            print("Your input is not valid!")
+            continue
 
     while not(stop):
             unique_identifier = str(secrets.token_hex(4))
