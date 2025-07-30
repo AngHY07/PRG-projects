@@ -32,19 +32,6 @@ current_map_layout = [list("################################"),
 
 twenty_percent_list = []
 
-def clear_safe_content():
-    global player_safe_information
-    global resources_map_safe_file
-    global portal_position_x_safe
-    global portal_position_y_safe
-    global name_safe
-    global fog_safe_file
-
-    player['name'] = "NA"
-    player_safe_information = {}
-    resources_map_safe_file = ["map"]
-    portal_position_x_safe = 0
-    portal_position_y_safe = 0
 
 def load_map(filename, map_struct,player):
     map_file = open(path + filename, 'r')
@@ -52,8 +39,7 @@ def load_map(filename, map_struct,player):
     global MAP_HEIGHT
     global current_map_layout
 
-    current_map_layout[player['y']].pop(player['x'])
-    current_map_layout[player['y']].insert(player['x'],"M")
+    current_map_layout[player['y']][player['x']] = "M"
 
     file_info = map_file.readlines()
     for lines in file_info: 
@@ -97,7 +83,7 @@ def map_print_fog():
 
 def initialize_game(resources_map,player):
 
-    player['high score count'] = 0 
+
     player['portal x'] = 1
     player['portal y'] =1
     player['x'] = 1
@@ -125,12 +111,12 @@ def initialize_game_safe_folder(player):
     global current_map_layout
     global resources_map
     global twenty_percent_list
-    global high_score_content
+
 
     current_map_layout.clear()
     resources_map.clear()
     twenty_percent_list.clear()
-    high_score_content.clear()
+
 
     with open(path + 'fogmap.txt','r') as file:
         info = file.read().split(",")
@@ -150,11 +136,11 @@ def initialize_game_safe_folder(player):
 
         info_3 = file_3.readlines()
 
-        for x in range(15):
+        for x in range(14):
             info_split = info_3[x].strip().split(",")
             player[info_split[0]] = int(info_split[1])
         
-        for x in range(15,18):
+        for x in range(14,17):
             info_split_2 = info_3[x].strip().split(",")
             player[info_split_2[0]] = str(info_split_2[1])
     
@@ -167,17 +153,7 @@ def initialize_game_safe_folder(player):
             add_list.append(int(line_split[1]))
             add_list.append(int(line_split[2]))
             twenty_percent_list.append(add_list)
-    with open(path + 'highscore.txt','r') as file_5: 
 
-        for lines in file_5: 
-            informations_split = lines.strip().split(',')
-            addition_list = []
-            addition_list.append(informations_split[0])
-            addition_list.append(int(informations_split[1]))
-            addition_list.append(int(informations_split[2]))
-            addition_list.append(int(informations_split[3]))
-            addition_list.append(informations_split[4])
-            high_score_content.append(addition_list)
 
 def draw_view (player):
     global current_map_layout
@@ -343,7 +319,7 @@ def ore_mining_w_s(player,value,copper_random,silver_random,gold_random):
             else :
                 player['load'] += copper_random
                 player['copper'] += copper_random
-            append_list = []
+            append_list = [] # 20 percent ore recorder
             append_list.append("C")
             append_list.append(player['y']+value)
             append_list.append(player['x'])
@@ -433,6 +409,7 @@ def ore_mining_a_d(player,value,copper_random,silver_random,gold_random):
             append_list = []
             append_list.append("S")
             append_list.append(player['y'])
+            append_list.append(player['x']+value)
             twenty_percent_list.append(append_list)
     elif resources_map[player['y']][player['x']+value] == "G":
             if player['pickaxe level'] < 3:
@@ -545,23 +522,15 @@ def movement_input(player,resources_map,user_input):
 
         ore_mining_w_s (player,-1,copper_price,silver_price,gold_price)
         if eligible_for_mine == True:
-            # Remove original postion
-            current_map_layout[player['y']].pop(player['x'])
-            resources_map[player['y']].pop(player['x'])
+            # Replace original position with empty string 
 
-            #Replace original position with blank space
-            current_map_layout[player['y']].insert(player['x']," ")
-            resources_map[player['y']].insert(player['x']," ")
+            current_map_layout[player['y']][player['x']] = " "
+            resources_map[player['y']][player['x']] = " "
 
-            # Remove the position on top
-            current_map_layout[player['y']-1].pop(player['x'])
-            resources_map[player['y']-1].pop(player['x'])
+            # Replace the position on top
+            current_map_layout[player['y']-1][player['x']]= "M"
+            resources_map[player['y']-1][player['x']] = "M"
 
-            #Replace position on top with M
-            current_map_layout[player['y']-1].insert(player['x'],"M")
-            resources_map[player['y']-1].insert(player['x'],"M")
-
-        
             player['y'] -= 1 
             player['turns'] -= 1
             player['steps'] += 1
@@ -578,25 +547,18 @@ def movement_input(player,resources_map,user_input):
         ore_mining_w_s (player,1,copper_price,silver_price,gold_price)
     
         if eligible_for_mine == True:
-            # Remove original postion
-            current_map_layout[player['y']].pop(player['x'])
-            resources_map[player['y']].pop(player['x'])
 
             #Replace original position with blank space
             if player["y"] == 1 and player["x"]  == 1:
-                current_map_layout[player['y']].insert(player['x'],"T")
-                resources_map[player['y']].insert(player['x'],"T")
+                current_map_layout[player['y']][player['x']] = "T"
+                resources_map[player['y']][player['x']] = "T"
             else: 
-                current_map_layout[player['y']].insert(player['x']," ")
-                resources_map[player['y']].insert(player['x']," ")
+                current_map_layout[player['y']][player['x']] = " "
+                resources_map[player['y']][player['x']] = " "
 
-            # Remove the position on bottom
-            current_map_layout[player['y']+1].pop(player['x'])
-            resources_map[player['y']+1].pop(player['x'])
-
-            #Replace position on bottom with M
-            current_map_layout[player['y']+1].insert(player['x'],"M")
-            resources_map[player['y']+1].insert(player['x'],"M")
+            # Replace the position at the bottom with M 
+            current_map_layout[player['y']+1][player['x']] = "M"
+            resources_map[player['y']+1][player['x']] = "M"
 
   
             player['y'] += 1
@@ -615,22 +577,14 @@ def movement_input(player,resources_map,user_input):
         ore_mining_a_d(player,-1,copper_price,silver_price,gold_price)
 
         if eligible_for_mine == True:
-            # Remove original postion
-            current_map_layout[player['y']].pop(player['x'])
-            resources_map[player['y']].pop(player['x'])
+            # Replace original position with empty string
 
-            #Replace original position with blank space
-            current_map_layout[player['y']].insert(player['x']," ")
-            resources_map[player['y']].insert(player['x']," ")
+            current_map_layout[player['y']][player['x']] = " "
+            resources_map[player['y']][player['x']] = " "
 
-            # Remove the position on right
-            current_map_layout[player['y']].pop(player['x']-1)
-            resources_map[player['y']].pop(player['x']-1)
-
-            #Replace position on right with M
-            current_map_layout[player['y']].insert(player['x']-1,"M")
-            resources_map[player['y']].insert(player['x']-1,"M")
-
+            # Replace the position on the left with M 
+            current_map_layout[player['y']][player['x']-1] = "M"
+            resources_map[player['y']][player['x']-1] = "M"
 
             player['x'] -= 1
             player['turns'] -= 1
@@ -648,25 +602,17 @@ def movement_input(player,resources_map,user_input):
         ore_mining_a_d(player,1,copper_price,silver_price,gold_price)
 
         if eligible_for_mine == True:
-            # Remove original postion
-            current_map_layout[player['y']].pop(player['x'])
-            resources_map[player['y']].pop(player['x'])
-
             #Replace original position with blank space
             if player["y"] == 1 and player["x"]  == 1:
-                current_map_layout[player['y']].insert(player['x'],"T")
-                resources_map[player['y']].insert(player['x'],"T")
+                current_map_layout[player['y']][player['x']] = "T"
+                resources_map[player['y']][player['x']] = "T"
             else: 
-                current_map_layout[player['y']].insert(player['x']," ")
-                resources_map[player['y']].insert(player['x']," ")
+                current_map_layout[player['y']][player['x']] = " "
+                resources_map[player['y']][player['x']] = " "
 
-            # Remove the position on right
-            current_map_layout[player['y']].pop(player['x']+1)
-            resources_map[player['y']].pop(player['x']+1)
-
-            #Replace position on right with M
-            current_map_layout[player['y']].insert(player['x']+1,"M")
-            resources_map[player['y']].insert(player['x']+1,"M")
+            # Replace the position at the right with M 
+            current_map_layout[player['y']][player['x']+1] = "M"
+            resources_map[player['y']][player['x']+1] = "M"
             player['x'] += 1
             player['turns'] -= 1
             player['steps'] += 1
@@ -684,22 +630,15 @@ def portal(player):
     silver_earning = 0
     gold_earning = 0
 
- 
-    current_map_layout[player['y']].pop(player['x'])
-    resources_map[player['y']].pop(player['x'])
 
-    current_map_layout[player['y']].insert(player['x'],"P")
-    resources_map[player['y']].insert(player['x'],"P")
+    current_map_layout[player['y']][player['x']] = "P"
+    resources_map[player['y']][player['x']] = "P"
 
     player['portal x'] = player['x']
     player['portal y']= player['y']
 
-
-    current_map_layout[1].pop(1)
-    resources_map[1].pop(1)
-
-    current_map_layout[1].insert(1,"M")
-    resources_map[1].insert(1,"M")
+    current_map_layout[1][1] = "M"
+    resources_map[1][1] = "M"
 
 
     print("-----------------------------------------------------")
@@ -780,19 +719,36 @@ def safe_game():
                     file_4.write(str(char[2]))
                     file_4.write("\n")
             
-            with open(path + "highscore.txt",'w') as file_5: 
-                for char in high_score_content: 
-                    file_5.write(char[0])
-                    file_5.write(',')
-                    file_5.write(str(char[1]))
-                    file_5.write(',')
-                    file_5.write(str(char[2]))
-                    file_5.write(',')
-                    file_5.write(str(char[3]))
-                    file_5.write(',')
-                    file_5.write(str(char[4]))
-                    file_5.write('\n')
-       
+def high_score_safe(): 
+    with open(path + "highscore.txt",'w') as file: 
+        for char in high_score_content: 
+            file.write(char[0])
+            file.write(',')
+            file.write(str(char[1]))
+            file.write(',')
+            file.write(str(char[2]))
+            file.write(',')
+            file.write(str(char[3]))
+            file.write(',')
+            file.write(str(char[4]))
+            file.write('\n')
+
+def high_score_safe_initialize():
+
+    global high_score_content
+
+    with open(path + 'highscore.txt','r') as file: 
+
+        for lines in file: 
+            informations_split = lines.strip().split(',')
+            addition_list = []
+            addition_list.append(informations_split[0])
+            addition_list.append(int(informations_split[1]))
+            addition_list.append(int(informations_split[2]))
+            addition_list.append(int(informations_split[3]))
+            addition_list.append(informations_split[4])
+            high_score_content.append(addition_list)
+
 def rearrange_score():
     global high_score_content
 
@@ -834,7 +790,7 @@ def rearrange_score():
 
 
 #--------------------------- MAIN GAME ---------------------------
-
+high_score_safe_initialize()
 print("---------------- Welcome to Sundrop Caves! ----------------")
 print("You spent all your money to get the deed to a mine, a small")
 print("  backpack, a simple pickaxe and a magical portal stone.")
@@ -867,6 +823,11 @@ while not(whole_game_stop):
             player['name'] = input("Greetings, miner! What is your name? ")
             print("Pleased to meet you, {}. Welcome to Sundrop Town!".format(player['name']))
     elif user_choice.lower() == "l":
+            with open(path + 'values.txt','r') as file_values: 
+                emptycheck = file_values.read()
+                if emptycheck == "":
+                    print("You currently do not have a saved game!")
+                    continue
             initialize_game(resources_map,player) #initialize all the dictionarys names 
             initialize_game_safe_folder(player) #this is to pull the informations from the save folder 
     elif user_choice.lower() == "q":
@@ -883,11 +844,14 @@ while not(whole_game_stop):
             else: 
                 print_length = 5
                 print_string = 5
-    
-            print('Top {} High Score'.format(print_string))
-            print("{:<8}    {:<4}    {:<5}    {}".format("Names",'Days','Steps','GP'))
+            
+            print('\nTop {} High Score'.format(print_string))
+            print("-----------------------------------------------------------")
+            print("  {:<8}    {:<4}    {:<5}    {}".format("Names",'Days','Steps','GP'))
+            print("-----------------------------------------------------------")
             for i in range(print_length):
-                print("{:<8}    {:>4}    {:>5}    {}".format(high_score_content[i][0],high_score_content[i][1],high_score_content[i][2],high_score_content[i][3]))
+                print("{}.{:<8}    {:>4}    {:>5}    {}".format(i+1,high_score_content[i][0],high_score_content[i][1],high_score_content[i][2],high_score_content[i][3]))
+            continue
     else: 
             print("Your input is not valid!")
             continue
@@ -895,13 +859,16 @@ while not(whole_game_stop):
     while not(stop):
             unique_identifier = str(secrets.token_hex(4))
             if player['gp'] >= 500:
+                high_score_count = len(high_score_content)
                 end_game(player)
                 high_score_content.append(list())
-                high_score_content[player['high score count']].append(player['name'])
-                high_score_content[player['high score count']].append(player['day'])
-                high_score_content[player['high score count']].append(player['steps'])
-                high_score_content[player['high score count']].append(player['gp'])
-                high_score_content[player['high score count']].append(unique_identifier)
+                high_score_content[high_score_count].append(player['name'])
+                high_score_content[high_score_count].append(player['day']-1)
+                high_score_content[high_score_count].append(player['steps'])
+                high_score_content[high_score_count].append(player['gp'])
+                high_score_content[high_score_count].append(unique_identifier)
+                high_score_safe()
+                initialize_game(resources_map,player)
                 stop = True
                 continue
 
