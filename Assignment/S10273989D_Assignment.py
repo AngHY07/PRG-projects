@@ -308,6 +308,11 @@ def ore_mining_w_s(player,value,copper_random,silver_random,gold_random):
     global twenty_percent_list
 
     if resources_map[player['y']+value][player['x']] == "C":
+            if player['load'] == player['current capacity']:
+                print("Your backpack is full")
+                eligible_for_mine = False
+                return
+
             print("\n---------------------------------------------------")
             print("You mined {} piece(s) of copper.".format(copper_random))
 
@@ -326,6 +331,10 @@ def ore_mining_w_s(player,value,copper_random,silver_random,gold_random):
             twenty_percent_list.append(append_list)
             
     elif resources_map[player['y']+value][player['x']] == "S":
+            if player['load'] == player['current capacity']:
+                print("Your backpack is full")
+                eligible_for_mine = False
+                return
             if player['pickaxe level'] == 1:
                 print("Your pickaxe level is not high enough to mine this ore!")
                 eligible_for_mine = False
@@ -349,6 +358,10 @@ def ore_mining_w_s(player,value,copper_random,silver_random,gold_random):
 
             
     elif resources_map[player['y']+value][player['x']] == "G":
+            if player['load'] == player['current capacity']:
+                print("Your backpack is full")
+                eligible_for_mine = False
+                return
             if player['pickaxe level'] < 3:
                 print("Your pickaxe level is not high enough to mine this ore!")
                 eligible_for_mine = False
@@ -374,6 +387,10 @@ def ore_mining_a_d(player,value,copper_random,silver_random,gold_random):
     global eligible_for_mine
 
     if resources_map[player['y']][player['x']+value] == "C":
+            if player['load'] == player['current capacity']:
+                print("Your backpack is full")
+                eligible_for_mine = False
+                return            
             print("\n---------------------------------------------------")
             print("You mined {} piece(s) of copper.".format(copper_random))
 
@@ -391,6 +408,10 @@ def ore_mining_a_d(player,value,copper_random,silver_random,gold_random):
             append_list.append(player['x']+value)
             twenty_percent_list.append(append_list)
     elif resources_map[player['y']][player['x']+value] == "S":
+            if player['load'] == player['current capacity']:
+                print("Your backpack is full")
+                eligible_for_mine = False
+                return
             if player['pickaxe level'] == 1:
                 print("Your pickaxe level is not high enough to mine this ore!")
                 eligible_for_mine = False
@@ -412,6 +433,10 @@ def ore_mining_a_d(player,value,copper_random,silver_random,gold_random):
             append_list.append(player['x']+value)
             twenty_percent_list.append(append_list)
     elif resources_map[player['y']][player['x']+value] == "G":
+            if player['load'] == player['current capacity']:
+                print("Your backpack is full")
+                eligible_for_mine = False
+                return
             if player['pickaxe level'] < 3:
                 print("Your pickaxe level is not high enough to mine this ore!")
                 eligible_for_mine = False
@@ -532,9 +557,10 @@ def movement_input(player,resources_map,user_input):
             resources_map[player['y']-1][player['x']] = "M"
 
             player['y'] -= 1 
-            player['turns'] -= 1
-            player['steps'] += 1
+            
             clear_fog(player,resources_map)
+        player['turns'] -= 1
+        player['steps'] += 1
         
         return 
     
@@ -562,9 +588,10 @@ def movement_input(player,resources_map,user_input):
 
   
             player['y'] += 1
-            player['turns'] -= 1
-            player['steps'] += 1
             clear_fog(player,resources_map)
+        
+        player['turns'] -= 1
+        player['steps'] += 1
         
         return 
     
@@ -587,9 +614,10 @@ def movement_input(player,resources_map,user_input):
             resources_map[player['y']][player['x']-1] = "M"
 
             player['x'] -= 1
-            player['turns'] -= 1
-            player['steps'] += 1
             clear_fog(player,resources_map)
+        
+        player['turns'] -= 1
+        player['steps'] += 1
 
         return 
 
@@ -614,9 +642,10 @@ def movement_input(player,resources_map,user_input):
             current_map_layout[player['y']][player['x']+1] = "M"
             resources_map[player['y']][player['x']+1] = "M"
             player['x'] += 1
-            player['turns'] -= 1
-            player['steps'] += 1
             clear_fog(player,resources_map)
+        
+        player['turns'] -= 1
+        player['steps'] += 1
         return 
     
 def portal(player): 
